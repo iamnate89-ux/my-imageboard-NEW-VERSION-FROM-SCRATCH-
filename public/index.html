@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nathan's Imageboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #eef2ff;
+      font-family: arial, helvetica, sans-serif;
+      font-size: 14px;
+      color: #333;
+    }
+
+    /* ── Top bar ── */
+    #top-bar {
+      background: #7788aa;
+      color: white;
+      padding: .35rem 1rem;
+      font-size: .8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #top-bar a { color: #dde; text-decoration: none; margin: 0 .4rem; }
+    #top-bar a:hover { text-decoration: underline; }
+
+    /* ── Header ── */
+    #header {
+      background: #d6daf0;
+      border-bottom: 1px solid #b7c0d8;
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+
+    #header h1 {
+      font-size: 2rem;
+      color: #444;
+      letter-spacing: 1px;
+      font-style: italic;
+    }
+
+    #header p {
+      color: #666;
+      font-size: .85rem;
+      margin-top: .3rem;
+    }
+
+    /* ── Board list container ── */
+    #main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #7788aa;
+      border-bottom: 1px solid #b7c0d8;
+      padding-bottom: .3rem;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .boards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: .6rem;
+      margin-bottom: 2rem;
+    }
+
+    .board-card {
+      background: white;
+      border: 1px solid #ccd;
+      border-radius: 6px;
+      padding: .7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      transition: background .15s, border-color .15s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .board-card:hover {
+      background: #d6daf0;
+      border-color: #7788aa;
+    }
+
+    .board-slug {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #7788aa;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .board-info .board-name {
+      font-weight: bold;
+      color: #333;
+      font-size: .95rem;
+    }
+
+    .board-info .board-desc {
+      font-size: .8rem;
+      color: #888;
+      margin-top: .1rem;
+    }
+
+    /* ── Footer ── */
+    #footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: .8rem;
+      color: #999;
+      border-top: 1px solid #ccd;
+      margin-top: 2rem;
+    }
+
+    #footer a { color: #7788aa; text-decoration: none; }
+    #footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div id="top-bar">
+  <div>
+    <a href="/">Home</a>
+    <a href="/rules.html">Rules</a>
+    <a href="/mod.html">Mod Panel</a>
+  </div>
+  <div>
+    Nathan's Imageboard © 2026
+  </div>
+</div>
+
+<div id="header">
+  <h1>Nathan's Imageboard</h1>
+  <p>Please read the rules before posting. This is still in testing.</p>
+</div>
+
+<div id="main">
+  <div class="section-title">Boards</div>
+  <div class="boards-grid" id="boards-grid">
+    <p style="color:#999">Loading boards...</p>
+  </div>
+</div>
+
+<div id="footer">
+  <p>Nathan's Imageboard &mdash; All posts are the responsibility of the poster.</p>
+  <p style="margin-top:.3rem"><a href="/mod.html">Staff Login</a></p>
+</div>
+
+<script>
+  fetch('/api/boards')
+    .then(r => r.json())
+    .then(boards => {
+      if (!boards.length) {
+        document.getElementById('boards-grid').innerHTML = '<p style="color:#999">No boards yet.</p>';
+        return;
+      }
+      document.getElementById('boards-grid').innerHTML = boards.map(b => `
+        <a class="board-card" href="/board.html?slug=${b.slug}">
+          <div class="board-slug">/${b.slug}/</div>
+          <div class="board-info">
+            <div class="board-name">${b.name}</div>
+            <div class="board-desc">${b.description || ''}</div>
+          </div>
+        </a>`).join('');
+    });
+</script>
+
+</body>
+</html>

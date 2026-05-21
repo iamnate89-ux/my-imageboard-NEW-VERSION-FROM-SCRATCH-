@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thread</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #eef2ff; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; }
+
+    #top-bar { background: #7788aa; color: white; padding: .35rem 1rem; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    #top-bar a { color: #dde; text-decoration: none; margin: 0 .4rem; }
+    #top-bar a:hover { text-decoration: underline; }
+
+    #page { max-width: 800px; margin: 0 auto; padding: 1rem; }
+
+    #reply-form-box { background: #d6daf0; border: 1px solid #b7c0d8; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
+    #reply-form-box textarea { width: 100%; height: 80px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px; padding: .4rem; border: 1px solid #b7c0d8; border-radius: 4px; }
+    #reply-form-box input[type="file"] { font-size: .85rem; }
+    #reply-form-box button { align-self: flex-start; background: #7788aa; color: white; border: none; padding: .4rem 1rem; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    #reply-form-box button:hover { background: #667799; }
+    .form-row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+
+    .post { display: flex; flex-direction: column; background: #f0e0d6; border: 1px solid #d9bfb7; border-radius: 4px; margin-bottom: .7rem; padding: .5rem; }
+    .post-header { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; margin-bottom: .4rem; font-size: .85rem; }
+    .postname { font-weight: bold; color: #117743; }
+    .staff-admin { font-weight: bold; color: #cc0000; }
+    .staff-janitor { font-weight: bold; color: #117743; }
+    .postnum { color: #7788aa; font-weight: bold; }
+    .postdate { color: #666; font-size: .8rem; }
+    .reply-btn { background: none; border: none; color: #7788aa; cursor: pointer; font-size: .85rem; padding: 0; }
+    .reply-btn:hover { text-decoration: underline; }
+    .report-btn { background: none; border: none; color: #c00; cursor: pointer; font-size: .85rem; padding: 0; opacity: .7; }
+    .report-btn:hover { opacity: 1; text-decoration: underline; }
+    .delete-btn { background: none; border: none; color: #c00; cursor: pointer; font-size: .85rem; padding: 0; opacity: .7; }
+    .delete-btn:hover { opacity: 1; text-decoration: underline; }
+    .post-body { display: flex; gap: .8rem; align-items: flex-start; }
+    .post-body.expanded-layout { flex-direction: column; }
+    .post-image img { max-width: 150px; max-height: 150px; display: block; border-radius: 2px; cursor: pointer; border: 1px solid #d9bfb7; }
+    .post-image img.expanded { max-width: 100%; max-height: none; display: block; }
+    .post-content { white-space: pre-wrap; word-break: break-word; flex: 1; line-height: 1.5; }
+    .quote-link { color: #789922; text-decoration: none; font-weight: bold; }
+    .quote-link:hover { text-decoration: underline; }
+    .greentext { color: #789922; }
+    .highlight { background: #fffbe6 !important; transition: background .3s; }
+
+    .locked-notice { background: #fff0f0; border: 1px solid #c00; border-radius: 4px; padding: .5rem 1rem; margin-bottom: .8rem; color: #c00; font-weight: bold; text-align: center; }
+    .pinned-notice { background: #f0fff0; border: 1px solid #2a7; border-radius: 4px; padding: .5rem 1rem; margin-bottom: .8rem; color: #2a7; font-weight: bold; text-align: center; }
+
+    .mod-controls { display: none; gap: .5rem; margin-bottom: .8rem; }
+    .mod-controls button { background: #7788aa; color: white; border: none; padding: .4rem .8rem; border-radius: 4px; cursor: pointer; font-size: .85rem; }
+    .mod-controls button:hover { background: #667799; }
+
+    /* Mature image */
+    .mature-wrapper { position: relative; display: inline-block; max-width: 150px; }
+    .mature-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.75); color: white; font-size: .65rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 2px; z-index: 2; padding: .3rem; line-height: 1.4; }
+    .mature-overlay:hover { background: rgba(0,0,0,.88); }
+    .mature-wrapper img { display: block; border-radius: 2px; border: 1px solid #d9bfb7; }
+
+    .ban-screen { background: #fff0f0; border: 2px solid #c00; border-radius: 8px; padding: 2rem; margin: 1rem 0; text-align: center; }
+    .ban-screen h2 { color: #c00; }
+    .ban-post { background: #fff; border: 1px solid #c00; border-radius: 6px; padding: 1rem; margin-top: 1rem; text-align: left; }
+    .ban-post p.label { color: #c00; font-weight: bold; margin-bottom: .5rem; }
+
+    .overlay { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999; }
+    .modal-box { background:white;padding:1.5rem;border-radius:8px;min-width:300px;max-width:400px; }
+    .modal-box h3 { margin-bottom:1rem; }
+
+    #footer { text-align:center; padding:1rem; font-size:.8rem; color:#999; border-top:1px solid #ccd; margin-top:2rem; }
+    #footer a { color:#7788aa; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+<div id="top-bar">
+  <div>
+    <a href="/">Home</a>
+    <a href="/rules.html">Rules</a>
+    <a href="/mod.html">Mod Panel</a>
+  </div>
+  <div>Nathan's Imageboard — Est. 2026</div>
+</div>
+
+<div id="page">
+  <div style="margin-bottom:.8rem;margin-top:.8rem"><a href="javascript:history.back()" style="color:#7788aa">← Back</a></div>
+
+  <div id="thread-notices"></div>
+
+  <div id="mod-controls" class="mod-controls">
+    <button id="btn-pin" onclick="togglePin()">📌 Pin</button>
+    <button id="btn-lock" onclick="toggleLock()">🔒 Lock</button>
+  </div>
+
+  <div id="reply-area">
+    <div id="reply-form-box">
+      <strong>Post a Reply</strong>
+      <form id="reply-form" enctype="multipart/form-data">
+        <div class="form-row" style="margin-bottom:.4rem">
+          <label style="font-size:.85rem">Comment</label>
+        </div>
+        <textarea name="content" id="reply-content" placeholder="Write your reply..."></textarea>
+        <div class="form-row" style="margin-top:.4rem">
+          <label style="font-size:.85rem">Image</label>
+          <input type="file" name="image" accept="image/*">
+        </div>
+        <div class="form-row" style="margin-top:.4rem">
+          <input type="checkbox" name="image_mature" id="mature-check-reply" value="1">
+          <label for="mature-check-reply" style="font-size:.85rem;color:#c00">⚠️ Mark image as mature (gore/graphic content)</label>
+        </div>
+        <div class="form-row" style="margin-top:.4rem">
+          <label style="font-size:.85rem">Delete Password</label>
+          <input type="password" name="delete_password" placeholder="Optional — lets you delete later" style="font-size:.85rem;padding:.3rem;border:1px solid #b7c0d8;border-radius:4px;width:220px">
+        </div>
+        <div class="form-row" style="margin-top:.5rem">
+          <button type="submit">Post Reply</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="posts"></div>
+</div>
+
+<!-- Report Modal -->
+<div id="report-modal" class="overlay" style="display:none">
+  <div class="modal-box">
+    <h3>Report Post</h3>
+    <p style="font-size:.85rem;color:#666;margin-bottom:.7rem">Select a reason for reporting this post:</p>
+    <select id="report-reason" style="width:100%;padding:.4rem;margin-bottom:.5rem;border-radius:4px;box-sizing:border-box">
+      <option value="">Select a reason...</option>
+      <option value="This post is spam or intentionally made to flood the site">This post is spam or intentionally made to flood the site</option>
+      <option value="This post requests, contains, or links to content that violates US law">This post requests, contains, or links to content that violates US law</option>
+      <option value="This post contains racism / hateful speech">This post contains racism / hateful speech</option>
+      <option value="This post contains pornography / real gore intended to glorify violence rather than in a documenting / academic manner and is not relevant to the topic at hand">This post contains pornography / real gore intended to glorify violence rather than in a documenting / academic manner and is not relevant to the topic at hand</option>
+      <option value="This post is off topic to the board it is posted">This post is off topic to the board it is posted</option>
+      <option value="This post contains copyrighted content">This post contains copyrighted content</option>
+      <option value="This user is manipulating staff">This user is manipulating staff</option>
+      <option value="This post has malicious links, viruses, or anything intended to harm other users">This post has malicious links, viruses, or anything intended to harm other users</option>
+      <option value="This post is a dox thread / attempting to get personal information about other users or people">This post is a dox thread / attempting to get personal information about other users or people</option>
+    </select>
+    <input id="report-other" placeholder="Additional details (optional)" style="width:100%;margin-bottom:.7rem;display:block;box-sizing:border-box">
+    <div style="display:flex;gap:.5rem">
+      <button onclick="submitReport()">Submit Report</button>
+      <button onclick="closeReportModal()">Cancel</button>
+    </div>
+    <p id="report-error" style="color:red;margin-top:.5rem;font-size:.85rem"></p>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="delete-modal" class="overlay" style="display:none">
+  <div class="modal-box">
+    <h3>Delete Post</h3>
+    <p style="font-size:.85rem;color:#666;margin-bottom:.7rem">Enter your delete password to delete this post.</p>
+    <input type="password" id="delete-password-input" placeholder="Delete password" style="width:100%;margin-bottom:.7rem;display:block;box-sizing:border-box;padding:.4rem;border:1px solid #ccc;border-radius:4px">
+    <div style="display:flex;gap:.5rem">
+      <button onclick="submitDeletePost()">Delete</button>
+      <button onclick="closeDeleteModal()">Cancel</button>
+    </div>
+    <p id="delete-error" style="color:red;margin-top:.5rem;font-size:.85rem"></p>
+  </div>
+</div>
+
+<div id="footer">
+  <a href="/">Home</a> — <a href="/rules.html">Rules</a>
+</div>
+
+<script>
+  const id = new URLSearchParams(location.search).get('id');
+  let reportTargetPostId = null;
+  let deleteTargetPostId = null;
+  let threadData = null;
+  let boardSlug = '';
+
+  function showBanScreen(data) {
+    const scopeMsg = data.ban_scope === 'board'
+      ? `You are banned from /${data.ban_board}/.`
+      : 'You are banned from all boards.';
+    document.getElementById('reply-area').innerHTML = `
+      <div class="ban-screen">
+        <div style="font-size:2rem">🔨</div>
+        <h2>You are banned</h2>
+        <p><strong>${scopeMsg}</strong></p>
+        <p><strong>Reason:</strong> ${data.reason || 'No reason given'}</p>
+        <p style="color:#666">${data.expires === 'Permanent' ? 'This ban is permanent.' : 'Expires: ' + new Date(data.expires).toLocaleString()}</p>
+        ${(data.post_content || data.post_image) ? `
+          <div class="ban-post">
+            <p class="label">Your rule-breaking post:</p>
+            ${data.post_image ? `<img src="/uploads/${data.post_image}" style="max-width:200px;display:block;margin-bottom:.5rem;border-radius:4px">` : ''}
+            ${data.post_content ? `<p style="white-space:pre-wrap">${data.post_content}</p>` : ''}
+          </div>` : ''}
+        <div style="margin-top:1.5rem;background:#fff;border:1px solid #faa;border-radius:6px;padding:1rem;text-align:left">
+          <strong style="color:#c00">Appeal this ban</strong>
+          <p style="font-size:.85rem;color:#666;margin:.4rem 0 .7rem">Explain why you believe this ban was issued in error.</p>
+          <textarea id="appeal-text" placeholder="Write your appeal..." style="width:100%;height:80px;resize:vertical;padding:.4rem;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box"></textarea>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center">
+            <button onclick="submitAppeal()" style="background:#7788aa;color:white;border:none;padding:.4rem 1rem;border-radius:4px;cursor:pointer">Submit Appeal</button>
+            <span id="appeal-status" style="font-size:.85rem"></span>
+          </div>
+        </div>
+        <p style="color:#666;margin-top:1rem">Your IP address has been banned.</p>
+      </div>`;
+  }
+
+  async function submitAppeal() {
+    const message = document.getElementById('appeal-text').value.trim();
+    const status = document.getElementById('appeal-status');
+    if (!message) { status.textContent = 'Please write an appeal message.'; status.style.color = 'red'; return; }
+    const res = await fetch('/api/appeals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById('appeal-text').disabled = true;
+      document.querySelector('[onclick="submitAppeal()"]').disabled = true;
+      status.textContent = 'Appeal submitted. Please wait for a moderator to review it.';
+      status.style.color = 'green';
+    } else {
+      status.textContent = data.error || 'Failed to submit appeal.';
+      status.style.color = 'red';
+    }
+  }
+
+  function openReportModal(postId) {
+    reportTargetPostId = postId;
+    document.getElementById('report-reason').value = '';
+    document.getElementById('report-other').value = '';
+    document.getElementById('report-error').textContent = '';
+    document.getElementById('report-modal').style.display = 'flex';
+  }
+
+  function closeReportModal() {
+    document.getElementById('report-modal').style.display = 'none';
+    reportTargetPostId = null;
+  }
+
+  async function submitReport() {
+    const reason = document.getElementById('report-reason').value;
+    const other = document.getElementById('report-other').value.trim();
+    if (!reason) { document.getElementById('report-error').textContent = 'Please select a reason.'; return; }
+    const fullReason = other ? `${reason} — ${other}` : reason;
+    const res = await fetch('/api/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: reportTargetPostId, reason: fullReason })
+    });
+    if (res.ok) { closeReportModal(); alert('Report submitted. Thank you.'); }
+    else { document.getElementById('report-error').textContent = 'Failed to submit report.'; }
+  }
+
+  function openDeleteModal(postId) {
+    deleteTargetPostId = postId;
+    document.getElementById('delete-password-input').value = '';
+    document.getElementById('delete-error').textContent = '';
+    document.getElementById('delete-modal').style.display = 'flex';
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+    deleteTargetPostId = null;
+  }
+
+  async function submitDeletePost() {
+    const password = document.getElementById('delete-password-input').value;
+    if (!password) { document.getElementById('delete-error').textContent = 'Enter your password.'; return; }
+    const res = await fetch(`/api/posts/${deleteTargetPostId}/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      closeDeleteModal();
+      loadPosts();
+    } else {
+      document.getElementById('delete-error').textContent = data.error || 'Failed to delete.';
+    }
+  }
+
+  function quotePost(postId) {
+    const textarea = document.getElementById('reply-content');
+    const quote = `>>${postId}\n`;
+    const start = textarea.selectionStart;
+    textarea.value = textarea.value.slice(0, start) + quote + textarea.value.slice(start);
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + quote.length;
+    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function highlightPost(postId) {
+    const el = document.getElementById('post-' + postId);
+    if (!el) return;
+    el.classList.add('highlight');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => el.classList.remove('highlight'), 1500);
+  }
+
+  function toggleImage(img) {
+    img.classList.toggle('expanded');
+    const postBody = img.closest('.post-body');
+    if (postBody) postBody.classList.toggle('expanded-layout');
+  }
+
+  function revealMature(postId) {
+    const wrapper = document.getElementById('mature-' + postId);
+    if (!wrapper) return;
+    wrapper.querySelector('.mature-overlay').style.display = 'none';
+    const img = wrapper.querySelector('img');
+    img.style.filter = 'none';
+    img.style.pointerEvents = 'auto';
+    img.style.maxWidth = '150px';
+    img.style.maxHeight = '150px';
+    img.style.cursor = 'pointer';
+    img.title = 'Click to expand';
+    wrapper.style.maxWidth = 'none';
+    img.onclick = () => {
+      if (img.classList.contains('expanded')) {
+        img.classList.remove('expanded');
+        img.style.maxWidth = '150px';
+        img.style.maxHeight = '150px';
+        const postBody = img.closest('.post-body');
+        if (postBody) postBody.classList.remove('expanded-layout');
+      } else {
+        img.classList.add('expanded');
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = 'none';
+        const postBody = img.closest('.post-body');
+        if (postBody) postBody.classList.add('expanded-layout');
+      }
+    };
+  }
+
+  function parseContent(content) {
+    return content
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^(&gt;&gt;\d+)/gm, (match, ref) => {
+        const num = ref.replace(/&gt;&gt;/g, '');
+        return `<a class="quote-link" onclick="highlightPost(${num})">&gt;&gt;${num}</a>`;
+      })
+      .replace(/^(&gt;(?!&gt;).+)/gm, '<span class="greentext">$1</span>');
+  }
+
+  function renderImage(p) {
+    if (!p.image_path) return '';
+    if (p.image_mature) {
+      return `
+        <div class="post-image">
+          <div class="mature-wrapper" id="mature-${p.id}">
+            <div class="mature-overlay" onclick="revealMature(${p.id})">
+              ⚠️ THIS IMAGE IS MARKED AS MATURE<br>VIEWER DISCRETION ADVISED<br>
+              <span style="font-size:.7rem;opacity:.8;margin-top:.3rem;display:block">Click to reveal</span>
+            </div>
+            <img src="/uploads/${p.image_path}"
+              style="max-width:150px;max-height:150px;filter:blur(12px);pointer-events:none"
+              title="Mature image">
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="post-image">
+        <img src="/uploads/${p.image_path}" onclick="toggleImage(this)" title="Click to expand">
+      </div>`;
+  }
+
+  function loadPosts() {
+    fetch(`/api/threads/${id}/posts`).then(r => r.json()).then(posts => {
+      document.getElementById('posts').innerHTML = posts.map((p) => `
+        <div class="post" id="post-${p.id}">
+          <div class="post-header">
+            ${p.staff_role
+              ? `<span class="staff-${p.staff_role}">## ${p.staff_role.charAt(0).toUpperCase() + p.staff_role.slice(1)} ${p.staff_name}</span>`
+              : `<span class="postname">Anonymous</span>`}
+            ${p.country && boardSlug === 'pol' ? `<img src="https://flagcdn.com/16x12/${p.country.toLowerCase()}.png" title="${p.country}" style="margin:0 .2rem;vertical-align:middle">` : ''}
+            <span class="postnum">No.${p.id}</span>
+            <button class="reply-btn" onclick="quotePost(${p.id})">Reply</button>
+            <button class="report-btn" onclick="openReportModal(${p.id})">Report</button>
+            <button class="delete-btn" onclick="openDeleteModal(${p.id})">Delete</button>
+            <span class="postdate">${new Date(p.created_at).toLocaleString()}</span>
+          </div>
+          <div class="post-body">
+            ${renderImage(p)}
+            <div class="post-content">${parseContent(p.content)}</div>
+          </div>
+        </div>`).join('');
+    });
+  }
+
+  async function togglePin() {
+    const res = await fetch(`/api/mod/threads/${id}/pin`, { method: 'POST' });
+    const data = await res.json();
+    document.getElementById('btn-pin').textContent = data.pinned ? '📌 Unpin' : '📌 Pin';
+    location.reload();
+  }
+
+  async function toggleLock() {
+    const res = await fetch(`/api/mod/threads/${id}/lock`, { method: 'POST' });
+    const data = await res.json();
+    document.getElementById('btn-lock').textContent = data.locked ? '🔒 Unlock' : '🔒 Lock';
+    location.reload();
+  }
+
+  fetch(`/api/threads/${id}/info`).then(r => r.json()).then(thread => {
+    threadData = thread;
+    boardSlug = thread.board_slug;
+    const notices = document.getElementById('thread-notices');
+    if (thread.pinned) notices.innerHTML += `<div class="pinned-notice">📌 This thread is pinned</div>`;
+    if (thread.locked) {
+      notices.innerHTML += `<div class="locked-notice">🔒 This thread is locked. No new replies.</div>`;
+    }
+    fetch('/api/staff/me').then(r => r.ok ? r.json() : null).then(staff => {
+      if (!staff) {
+        if (thread.locked) document.getElementById('reply-form-box').style.display = 'none';
+        return;
+      }
+      const controls = document.getElementById('mod-controls');
+      controls.style.display = 'flex';
+      document.getElementById('btn-pin').textContent = thread.pinned ? '📌 Unpin' : '📌 Pin';
+      document.getElementById('btn-lock').textContent = thread.locked ? '🔒 Unlock' : '🔒 Lock';
+    });
+  });
+
+  document.getElementById('reply-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch(`/api/threads/${id}/posts`, {
+      method: 'POST',
+      body: new FormData(e.target)
+    });
+    if (res.status === 403) {
+      const data = await res.json();
+      if (data.error === 'This thread is locked.') {
+        alert('This thread is locked.');
+        return;
+      }
+      showBanScreen(data);
+      return;
+    }
+    e.target.reset();
+    loadPosts();
+  };
+
+  fetch('/api/ban-check').then(res => {
+    if (res.status === 403) res.json().then(showBanScreen);
+  });
+
+  loadPosts();
+</script>
+</body>
+</html>

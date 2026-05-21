@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mod Panel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #eef2ff; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; padding: 1rem; }
+    h2, h3 { color: #444; margin-bottom: .7rem; }
+    input, select, textarea { padding: .4rem; border: 1px solid #b7c0d8; border-radius: 4px; font-family: inherit; font-size: 14px; }
+    button { background: #7788aa; color: white; border: none; padding: .4rem .8rem; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #667799; }
+    .hidden { display: none !important; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ccd; padding: .5rem; text-align: left; font-size: .9rem; }
+    th { background: #d6daf0; }
+    .role-admin { color: #c00; font-weight: bold; }
+    .role-janitor { color: #770; font-weight: bold; }
+    .tabs { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab { padding: .4rem .9rem; cursor: pointer; background: #d6daf0; border-radius: 4px; border: none; font-size: 14px; }
+    .tab.active { background: #7788aa; color: white; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .danger { background: #c44; color: white; }
+    .danger:hover { background: #a33; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 999; }
+    .modal-box { background: white; padding: 1.5rem; border-radius: 8px; min-width: 300px; max-width: 400px; }
+    .modal-box h3 { margin-bottom: 1rem; }
+    .modal-box input { width: 100%; margin-bottom: .5rem; display: block; box-sizing: border-box; }
+    #login-box { max-width: 300px; margin: 3rem auto; background: #d6daf0; padding: 1.5rem; border-radius: 8px; border: 1px solid #b7c0d8; }
+    #login-box h2 { margin-bottom: 1rem; }
+    #login-box input { width: 100%; margin-bottom: .5rem; display: block; box-sizing: border-box; }
+    #login-box button { width: 100%; margin-top: .3rem; }
+  </style>
+</head>
+<body>
+
+<div id="login-box">
+  <h2>Staff Login</h2>
+  <form id="login-form">
+    <input id="username" placeholder="Username" required>
+    <input id="password" type="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+  <p id="login-error" style="color:red;margin-top:.5rem"></p>
+</div>
+
+<div id="dashboard" class="hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <h2>Mod Panel — <span id="staff-name"></span> (<span id="staff-role"></span>)</h2>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('posts', this)">Posts</button>
+    <button class="tab" id="tab-reports" onclick="showTab('reports', this)">
+      Reports <span id="report-count" style="background:#c00;color:white;border-radius:10px;padding:0 .4rem;font-size:.75rem;margin-left:.3rem;display:none"></span>
+    </button>
+    <button class="tab" id="tab-bans" onclick="showTab('bans', this)">Bans</button>
+    <button class="tab" id="tab-appeals" onclick="showTab('appeals', this)">
+      Appeals <span id="appeal-count" style="background:#c00;color:white;border-radius:10px;padding:0 .4rem;font-size:.75rem;margin-left:.3rem;display:none"></span>
+    </button>
+    <button class="tab" id="tab-staff" onclick="showTab('staff', this)">Staff</button>
+    <button class="tab" id="tab-boards" onclick="showTab('boards', this)">Boards</button>
+    <button class="tab" id="tab-log" onclick="showTab('log', this)">Log</button>
+  </div>
+
+  <!-- Posts -->
+  <div id="section-posts" class="section active">
+    <h3>Recent Posts</h3>
+    <div style="display:flex;gap:.5rem;margin-bottom:.5rem;align-items:center;flex-wrap:wrap">
+      <input id="thread-filter" placeholder="Filter by Thread ID (optional)" style="width:220px">
+      <button onclick="loadPosts()">Refresh</button>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Thread</th><th>Board</th><th>Content</th><th>Image</th><th>IP</th><th>Country</th><th>Actions</th></tr></thead>
+      <tbody id="posts-table"><tr><td colspan="8">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Reports -->
+  <div id="section-reports" class="section">
+    <h3>Open Reports</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Board</th><th>Post</th><th>Reason</th><th>Reporter IP</th><th>Time</th><th>Actions</th></tr></thead>
+      <tbody id="reports-table"><tr><td colspan="7">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Bans -->
+  <div id="section-bans" class="section">
+    <h3>Active Bans</h3>
+    <table>
+      <thead><tr><th>ID</th><th>IP</th><th>Reason</th><th>By</th><th>Expires</th><th>Actions</th></tr></thead>
+      <tbody id="bans-table"><tr><td colspan="6">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Appeals -->
+  <div id="section-appeals" class="section">
+    <h3>Pending Appeals</h3>
+    <table>
+      <thead><tr><th>ID</th><th>IP</th><th>Ban Reason</th><th>Banned By</th><th>Expires</th><th>Appeal Message</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <tbody id="appeals-table"><tr><td colspan="8">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Staff -->
+  <div id="section-staff" class="section">
+    <h3>Create Staff Account</h3>
+    <form id="create-staff-form" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+      <input id="new-username" placeholder="Username" style="width:140px">
+      <input id="new-password" type="password" placeholder="Password" style="width:140px">
+      <select id="new-role">
+        <option value="janitor">Janitor</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button type="submit">Create</button>
+    </form>
+    <table>
+      <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+      <tbody id="staff-table"></tbody>
+    </table>
+  </div>
+
+  <!-- Boards -->
+  <div id="section-boards" class="section">
+    <h3>Create New Board</h3>
+    <form id="create-board-form" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+      <input id="new-board-slug" placeholder="Slug (e.g. g)" style="width:80px" maxlength="4">
+      <input id="new-board-name" placeholder="Name (e.g. Technology)" style="width:180px">
+      <input id="new-board-desc" placeholder="Description (optional)" style="width:220px">
+      <button type="submit">Create</button>
+    </form>
+    <table>
+      <thead><tr><th>Slug</th><th>Name</th><th>Description</th><th>Actions</th></tr></thead>
+      <tbody id="boards-table"></tbody>
+    </table>
+  </div>
+
+  <!-- Log -->
+  <div id="section-log" class="section">
+    <h3>Mod Log</h3>
+    <table>
+      <thead><tr><th>Time</th><th>Staff</th><th>Action</th><th>Target</th><th>Note</th></tr></thead>
+      <tbody id="log-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Ban Modal -->
+<div id="ban-modal" class="overlay hidden">
+  <div class="modal-box">
+    <h3>Ban User</h3>
+    <input id="ban-reason" placeholder="Reason">
+    <input id="ban-duration" type="number" placeholder="Hours (blank = permanent)">
+    <div style="display:flex;gap:.5rem;margin-top:.5rem">
+      <button onclick="submitBan()">Ban</button>
+      <button onclick="closeBanModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ban Poster Modal -->
+<div id="ban-poster-modal" class="overlay hidden">
+  <div class="modal-box">
+    <h3>Ban Post Author</h3>
+    <p style="font-size:.85rem;color:#666;margin-bottom:.7rem">The post will be deleted and the user banned.</p>
+    <input id="ban-poster-reason" placeholder="Reason">
+    <input id="ban-poster-duration" type="number" placeholder="Hours (blank = permanent)">
+    <div style="display:flex;gap:.5rem;margin-top:.5rem">
+      <button onclick="submitBanPoster()">Ban</button>
+      <button onclick="document.getElementById('ban-poster-modal').classList.add('hidden')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ban Reporter Modal -->
+<div id="ban-reporter-modal" class="overlay hidden">
+  <div class="modal-box">
+    <h3>Ban Reporter</h3>
+    <p style="font-size:.85rem;color:#666;margin-bottom:.7rem">Ban this user for abusing the report system.</p>
+    <input id="ban-reporter-reason" placeholder="Reason">
+    <input id="ban-reporter-duration" type="number" placeholder="Hours (blank = permanent)">
+    <div style="display:flex;gap:.5rem;margin-top:.5rem">
+      <button onclick="submitBanReporter()">Ban Reporter</button>
+      <button onclick="document.getElementById('ban-reporter-modal').classList.add('hidden')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentRole = '';
+  let banTargetPostId = null;
+
+  // ── Auth ──────────────────────────────────────────────────
+  document.getElementById('login-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/staff/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) return document.getElementById('login-error').textContent = data.error;
+    showDashboard(data);
+  };
+
+  async function logout() {
+    await fetch('/api/staff/logout', { method: 'POST' });
+    location.reload();
+  }
+
+  async function init() {
+    const res = await fetch('/api/staff/me');
+    if (res.ok) showDashboard(await res.json());
+  }
+
+  function showDashboard(staff) {
+    currentRole = staff.role;
+    document.getElementById('login-box').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('staff-name').textContent = staff.username;
+    document.getElementById('staff-role').textContent = staff.role;
+    if (staff.role !== 'admin') {
+      document.getElementById('tab-staff').classList.add('hidden');
+      document.getElementById('tab-boards').classList.add('hidden');
+      document.getElementById('tab-log').classList.add('hidden');
+    }
+    loadPosts();
+    loadReportCount();
+    loadAppealCount();
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────
+  function showTab(name, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    btn.classList.add('active');
+    if (name === 'reports') loadReports();
+    if (name === 'bans') loadBans();
+    if (name === 'staff') loadStaff();
+    if (name === 'boards') loadBoards();
+    if (name === 'log') loadLog();
+    if (name === 'appeals') loadAppeals();
+  }
+
+  // ── Posts ─────────────────────────────────────────────────
+  async function loadPosts() {
+    const threadId = document.getElementById('thread-filter').value.trim();
+    const url = threadId ? `/api/threads/${threadId}/posts` : '/api/mod/recent-posts';
+    const res = await fetch(url);
+    const posts = await res.json();
+    if (!posts.length) {
+      document.getElementById('posts-table').innerHTML = '<tr><td colspan="8">No posts found.</td></tr>';
+      return;
+    }
+    document.getElementById('posts-table').innerHTML = posts.map(p => `
+      <tr>
+        <td>${p.id}</td>
+        <td>${p.thread_id}</td>
+        <td>${p.board_slug || '—'}</td>
+        <td>${p.content.substring(0, 80)}${p.content.length > 80 ? '…' : ''}</td>
+        <td>${p.image_path ? `<img src="/uploads/${p.image_path}" style="max-width:60px;max-height:60px;${p.image_mature ? 'filter:blur(4px)' : ''}">` : '—'}</td>
+        <td style="font-size:.8rem">${p.ip_address || '—'}</td>
+        <td style="font-size:.8rem">${p.country ? `<img src="https://flagcdn.com/16x12/${p.country.toLowerCase()}.png" title="${p.country}"> ${p.country}` : '—'}</td>
+        <td>
+          <div style="display:flex;gap:.3rem;flex-wrap:wrap">
+            <button onclick="deletePost(${p.id})">Del Post</button>
+            ${p.image_path ? `<button onclick="deleteImage(${p.id})">Del Img</button>` : ''}
+            ${p.image_path ? `<button onclick="toggleMature(${p.id})" style="${p.image_mature ? 'background:#e67e00' : ''}">${p.image_mature ? '🔞 Unmark' : '🔞 Mature'}</button>` : ''}
+            <button class="danger" onclick="openBanModal(${p.id})">Ban</button>
+            <button onclick="pinThread(${p.thread_id})">📌 Pin</button>
+            <button onclick="lockThread(${p.thread_id})">🔒 Lock</button>
+            <button onclick="deleteAllByIP('${p.ip_address}')">Del All IP</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function deletePost(id) {
+    if (!confirm('Delete this post?')) return;
+    await fetch(`/api/mod/posts/${id}`, { method: 'DELETE' });
+    loadPosts();
+  }
+
+  async function deleteImage(id) {
+    if (!confirm('Delete image only?')) return;
+    await fetch(`/api/mod/posts/${id}/image`, { method: 'DELETE' });
+    loadPosts();
+  }
+
+  async function toggleMature(postId) {
+    await fetch(`/api/mod/posts/${postId}/mature`, { method: 'POST' });
+    loadPosts();
+  }
+
+  async function deleteAllByIP(ip) {
+    if (!confirm(`Delete ALL posts from IP ${ip}?`)) return;
+    const res = await fetch(`/api/mod/posts/by-ip/${encodeURIComponent(ip)}`, { method: 'DELETE' });
+    const data = await res.json();
+    alert(`Deleted ${data.deleted} post(s) from ${ip}`);
+    loadPosts();
+  }
+
+  async function pinThread(threadId) {
+    await fetch(`/api/mod/threads/${threadId}/pin`, { method: 'POST' });
+    alert('Thread pin toggled.');
+    loadPosts();
+  }
+
+  async function lockThread(threadId) {
+    await fetch(`/api/mod/threads/${threadId}/lock`, { method: 'POST' });
+    alert('Thread lock toggled.');
+    loadPosts();
+  }
+
+  // ── Ban Modal ─────────────────────────────────────────────
+  function openBanModal(postId) {
+    banTargetPostId = postId;
+    document.getElementById('ban-reason').value = '';
+    document.getElementById('ban-duration').value = '';
+    document.getElementById('ban-modal').classList.remove('hidden');
+  }
+
+  function closeBanModal() {
+    document.getElementById('ban-modal').classList.add('hidden');
+    banTargetPostId = null;
+  }
+
+  async function submitBan() {
+    const reason = document.getElementById('ban-reason').value;
+    const hours = document.getElementById('ban-duration').value;
+    await fetch('/api/mod/ban', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: banTargetPostId, reason, duration_hours: hours || null })
+    });
+    closeBanModal();
+    alert('User banned.');
+    loadPosts();
+  }
+
+  // ── Bans ──────────────────────────────────────────────────
+  async function loadBans() {
+    const res = await fetch('/api/admin/bans');
+    const bans = await res.json();
+    document.getElementById('bans-table').innerHTML = bans.length
+      ? bans.map(b => `
+        <tr>
+          <td>${b.id}</td>
+          <td>${b.ip_address}</td>
+          <td>${b.reason || '—'}</td>
+          <td>${b.banned_by || '—'}</td>
+          <td>${b.expires_at ? new Date(b.expires_at).toLocaleString() : 'Permanent'}</td>
+          <td><button onclick="unban(${b.id})">Unban</button></td>
+        </tr>`).join('')
+      : '<tr><td colspan="6">No active bans.</td></tr>';
+  }
+
+  async function unban(id) {
+    if (!confirm('Remove this ban?')) return;
+    await fetch(`/api/mod/bans/${id}`, { method: 'DELETE' });
+    loadBans();
+  }
+
+  // ── Appeals ───────────────────────────────────────────────
+  async function loadAppealCount() {
+    const res = await fetch('/api/mod/appeals');
+    const appeals = await res.json();
+    const badge = document.getElementById('appeal-count');
+    if (appeals.length > 0) {
+      badge.textContent = appeals.length;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  async function loadAppeals() {
+    const res = await fetch('/api/mod/appeals');
+    const appeals = await res.json();
+    if (!appeals.length) {
+      document.getElementById('appeals-table').innerHTML = '<tr><td colspan="8">No pending appeals.</td></tr>';
+      return;
+    }
+    document.getElementById('appeals-table').innerHTML = appeals.map(a => `
+      <tr id="appeal-row-${a.id}">
+        <td>${a.id}</td>
+        <td style="font-size:.8rem">${a.ip_address}</td>
+        <td>${a.ban_reason || '—'}</td>
+        <td>${a.banned_by || '—'}</td>
+        <td style="font-size:.8rem">${a.expires_at ? new Date(a.expires_at).toLocaleString() : 'Permanent'}</td>
+        <td style="max-width:220px;white-space:pre-wrap;font-size:.85rem">${a.message}</td>
+        <td style="font-size:.8rem">${new Date(a.created_at).toLocaleString()}</td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:.3rem">
+            <button style="background:#2a7;color:white;border:none;padding:.3rem .6rem;border-radius:4px;cursor:pointer" onclick="resolveAppeal(${a.id}, 'accept')">Accept</button>
+            <button class="danger" onclick="resolveAppeal(${a.id}, 'reject')">Reject</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function resolveAppeal(id, action) {
+    if (!confirm(action === 'accept' ? 'Accept this appeal and unban the user?' : 'Reject this appeal?')) return;
+    await fetch(`/api/mod/appeals/${id}/${action}`, { method: 'POST' });
+    loadAppeals();
+    loadAppealCount();
+    if (action === 'accept') loadBans();
+  }
+
+  // ── Staff ─────────────────────────────────────────────────
+  async function loadStaff() {
+    const res = await fetch('/api/admin/staff');
+    const staff = await res.json();
+    document.getElementById('staff-table').innerHTML = staff.map(s => `
+      <tr>
+        <td>${s.id}</td>
+        <td>${s.username}</td>
+        <td class="role-${s.role}">${s.role}</td>
+        <td>${new Date(s.created_at).toLocaleDateString()}</td>
+        <td><button class="danger" onclick="deleteStaff(${s.id})">Remove</button></td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('create-staff-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/admin/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('new-username').value,
+        password: document.getElementById('new-password').value,
+        role: document.getElementById('new-role').value
+      })
+    });
+    if (res.ok) {
+      document.getElementById('new-username').value = '';
+      document.getElementById('new-password').value = '';
+      loadStaff();
+    }
+  };
+
+  async function deleteStaff(id) {
+    if (!confirm('Remove this staff member?')) return;
+    await fetch(`/api/admin/staff/${id}`, { method: 'DELETE' });
+    loadStaff();
+  }
+
+  // ── Boards ────────────────────────────────────────────────
+  async function loadBoards() {
+    const res = await fetch('/api/boards');
+    const boards = await res.json();
+    document.getElementById('boards-table').innerHTML = boards.length
+      ? boards.map(b => `
+        <tr>
+          <td>/${b.slug}/</td>
+          <td>${b.name}</td>
+          <td>${b.description || '—'}</td>
+          <td><button class="danger" onclick="deleteBoard('${b.slug}', '${b.name}')">Delete</button></td>
+        </tr>`).join('')
+      : '<tr><td colspan="4">No boards found.</td></tr>';
+  }
+
+  document.getElementById('create-board-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const slug = document.getElementById('new-board-slug').value.trim();
+    const name = document.getElementById('new-board-name').value.trim();
+    const desc = document.getElementById('new-board-desc').value.trim();
+    if (!slug || !name) return alert('Slug and name are required.');
+    const res = await fetch('/api/admin/boards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, name, description: desc })
+    });
+    const data = await res.json();
+    if (!res.ok) return alert(data.error);
+    document.getElementById('new-board-slug').value = '';
+    document.getElementById('new-board-name').value = '';
+    document.getElementById('new-board-desc').value = '';
+    loadBoards();
+  };
+
+  async function deleteBoard(slug, name) {
+    if (!confirm(`Delete /${slug}/ — ${name}? All threads and posts will be lost.`)) return;
+    const res = await fetch(`/api/admin/boards/${slug}`, { method: 'DELETE' });
+    if (res.ok) loadBoards();
+  }
+
+  // ── Reports ───────────────────────────────────────────────
+  async function loadReportCount() {
+    const res = await fetch('/api/mod/reports');
+    const reports = await res.json();
+    const badge = document.getElementById('report-count');
+    if (reports.length > 0) {
+      badge.textContent = reports.length;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  async function loadReports() {
+    const res = await fetch('/api/mod/reports');
+    const reports = await res.json();
+    if (!reports.length) {
+      document.getElementById('reports-table').innerHTML = '<tr><td colspan="7">No open reports.</td></tr>';
+      return;
+    }
+    document.getElementById('reports-table').innerHTML = reports.map(r => `
+      <tr id="report-row-${r.id}">
+        <td>${r.id}</td>
+        <td>/${r.board_slug}/</td>
+        <td>
+          <strong>No.${r.post_id}</strong><br>
+          ${r.post_image ? `<img src="/uploads/${r.post_image}" style="max-width:80px;max-height:80px;display:block;margin:.3rem 0;border-radius:4px">` : ''}
+          <span style="font-size:.85rem;color:#444">${r.post_content ? r.post_content.substring(0, 100) + (r.post_content.length > 100 ? '…' : '') : '<em>deleted</em>'}</span>
+        </td>
+        <td>${r.reason}</td>
+        <td style="font-size:.8rem">${r.reporter_ip || '—'}</td>
+        <td style="font-size:.8rem">${new Date(r.created_at).toLocaleString()}</td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:.3rem">
+            <button onclick="deleteReportedPost(${r.id})">Del Post</button>
+            <button class="danger" onclick="openBanPosterModal(${r.id})">Ban Poster</button>
+            <button onclick="dismissReport(${r.id})">Dismiss</button>
+            <button class="danger" onclick="openBanReporterModal(${r.id})">Ban Reporter</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function deleteReportedPost(reportId) {
+    if (!confirm('Delete this post and close the report?')) return;
+    await fetch(`/api/mod/reports/${reportId}/delete-post`, { method: 'POST' });
+    loadReports();
+    loadReportCount();
+  }
+
+  async function dismissReport(reportId) {
+    if (!confirm('Dismiss this report?')) return;
+    await fetch(`/api/mod/reports/${reportId}/dismiss`, { method: 'POST' });
+    loadReports();
+    loadReportCount();
+  }
+
+  let banPosterReportId = null;
+  function openBanPosterModal(reportId) {
+    banPosterReportId = reportId;
+    document.getElementById('ban-poster-reason').value = '';
+    document.getElementById('ban-poster-duration').value = '';
+    document.getElementById('ban-poster-modal').classList.remove('hidden');
+  }
+
+  async function submitBanPoster() {
+    const reason = document.getElementById('ban-poster-reason').value || 'Rule violation';
+    const hours = document.getElementById('ban-poster-duration').value;
+    await fetch(`/api/mod/reports/${banPosterReportId}/ban-poster`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason, duration_hours: hours || null })
+    });
+    document.getElementById('ban-poster-modal').classList.add('hidden');
+    loadReports();
+    loadReportCount();
+    alert('Poster banned and post deleted.');
+  }
+
+  let banReporterReportId = null;
+  function openBanReporterModal(reportId) {
+    banReporterReportId = reportId;
+    document.getElementById('ban-reporter-reason').value = '';
+    document.getElementById('ban-reporter-duration').value = '';
+    document.getElementById('ban-reporter-modal').classList.remove('hidden');
+  }
+
+  async function submitBanReporter() {
+    const reason = document.getElementById('ban-reporter-reason').value || 'Abuse of report system';
+    const hours = document.getElementById('ban-reporter-duration').value;
+    await fetch(`/api/mod/reports/${banReporterReportId}/ban-reporter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason, duration_hours: hours || null })
+    });
+    document.getElementById('ban-reporter-modal').classList.add('hidden');
+    loadReports();
+    loadReportCount();
+    alert('Reporter banned and report dismissed.');
+  }
+
+  // ── Log ───────────────────────────────────────────────────
+  async function loadLog() {
+    const res = await fetch('/api/admin/log');
+    const logs = await res.json();
+    document.getElementById('log-table').innerHTML = logs.length
+      ? logs.map(l => `
+        <tr>
+          <td>${new Date(l.created_at).toLocaleString()}</td>
+          <td>${l.staff_username}</td>
+          <td>${l.action}</td>
+          <td>${l.target_id || '—'}</td>
+          <td>${l.note || '—'}</td>
+        </tr>`).join('')
+      : '<tr><td colspan="5">No actions logged yet.</td></tr>';
+  }
+
+  init();
+</script>
+</body>
+</html>
