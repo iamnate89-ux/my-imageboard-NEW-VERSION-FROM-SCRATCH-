@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image - Chat Masala</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #111; color: #f7f7f7; font-family: arial, helvetica, sans-serif; font-size: 14px; }
+    #top-bar { background: #FF9933; color: white; padding: .45rem 1rem; display: flex; justify-content: space-between; align-items: center; }
+    #top-bar a { color: white; text-decoration: none; margin-right: .8rem; }
+    #top-bar a:hover { text-decoration: underline; }
+    #viewer { min-height: calc(100vh - 36px); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    #viewer img { max-width: 100%; max-height: calc(100vh - 70px); object-fit: contain; background: #222; }
+    #error { color: #ffd3a6; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="top-bar">
+    <div>
+      <a href="javascript:history.back()">Back</a>
+      <a id="direct-link" href="#">Direct file</a>
+    </div>
+    <div>Chat Masala</div>
+  </div>
+  <div id="viewer"></div>
+
+  <script>
+    const file = new URLSearchParams(location.search).get('file') || '';
+    const viewer = document.getElementById('viewer');
+    const directLink = document.getElementById('direct-link');
+
+    if (!/^[a-zA-Z0-9._-]+$/.test(file)) {
+      viewer.innerHTML = '<p id="error">Image not found.</p>';
+      directLink.style.display = 'none';
+    } else {
+      const src = `/uploads/${encodeURIComponent(file)}`;
+      document.title = `${file} - Chat Masala`;
+      directLink.href = src;
+      directLink.target = '_blank';
+      directLink.rel = 'noopener';
+      viewer.innerHTML = `<img src="${src}" alt="">`;
+    }
+  </script>
+</body>
+</html>

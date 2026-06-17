@@ -5,29 +5,32 @@
   <title>Thread</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #eef2ff; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; }
+    body { background: #FFF8F0; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; }
 
-    #top-bar { background: #7788aa; color: white; padding: .35rem 1rem; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; width: 100%; }
-    #top-bar a { color: #dde; text-decoration: none; margin: 0 .4rem; }
+    #top-bar { background: #FF9933; color: white; padding: .35rem 1rem; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    #top-bar a { color: #fff7ef; text-decoration: none; margin: 0 .4rem; }
     #top-bar a:hover { text-decoration: underline; }
 
     #page { max-width: 800px; margin: 0 auto; padding: 1rem; }
 
-    #reply-form-box { background: #d6daf0; border: 1px solid #b7c0d8; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
-    #reply-form-box textarea { width: 100%; height: 80px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px; padding: .4rem; border: 1px solid #b7c0d8; border-radius: 4px; }
+    #reply-form-box { background: #fff; border: 1px solid #FF9933; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
+    #reply-form-box textarea { width: 100%; height: 80px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px; padding: .4rem; border: 1px solid #FFD3A6; border-radius: 4px; }
     #reply-form-box input[type="file"] { font-size: .85rem; }
-    #reply-form-box button { align-self: flex-start; background: #7788aa; color: white; border: none; padding: .4rem 1rem; border-radius: 4px; cursor: pointer; font-size: 14px; }
-    #reply-form-box button:hover { background: #667799; }
+    #reply-form-box button { align-self: flex-start; background: #138808; color: white; border: none; padding: .4rem 1rem; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    #reply-form-box button:hover { background: #0d6606; }
     .form-row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 
-    .post { display: flex; flex-direction: column; background: #f0e0d6; border: 1px solid #d9bfb7; border-radius: 4px; margin-bottom: .7rem; padding: .5rem; }
+    .post { display: flex; flex-direction: column; background: #fff; border: 1px solid #FFD3A6; border-radius: 4px; margin-bottom: .7rem; padding: .5rem; }
     .post-header { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; margin-bottom: .4rem; font-size: .85rem; }
     .postname { font-weight: bold; color: #117743; }
+    .tripcode { color: #000080; font-weight: normal; }
     .staff-admin { font-weight: bold; color: #cc0000; }
+    .staff-moderator { font-weight: bold; color: #075985; }
     .staff-janitor { font-weight: bold; color: #117743; }
-    .postnum { color: #7788aa; font-weight: bold; }
+    .postnum { color: #000080; font-weight: bold; }
     .postdate { color: #666; font-size: .8rem; }
-    .reply-btn { background: none; border: none; color: #7788aa; cursor: pointer; font-size: .85rem; padding: 0; }
+    .down-badge { color: #666; border: 1px solid #FFD3A6; border-radius: 3px; padding: .05rem .25rem; font-size: .75rem; background: #fff8f0; }
+    .reply-btn { background: none; border: none; color: #000080; cursor: pointer; font-size: .85rem; padding: 0; }
     .reply-btn:hover { text-decoration: underline; }
     .report-btn { background: none; border: none; color: #c00; cursor: pointer; font-size: .85rem; padding: 0; opacity: .7; }
     .report-btn:hover { opacity: 1; text-decoration: underline; }
@@ -35,8 +38,11 @@
     .delete-btn:hover { opacity: 1; text-decoration: underline; }
     .post-body { display: flex; gap: .8rem; align-items: flex-start; }
     .post-body.expanded-layout { flex-direction: column; }
-    .post-image img { max-width: 150px; max-height: 150px; display: block; border-radius: 2px; cursor: pointer; border: 1px solid #d9bfb7; }
+    .post-image img { max-width: 150px; max-height: 150px; display: block; border-radius: 2px; cursor: pointer; border: 1px solid #FFD3A6; }
     .post-image img.expanded { max-width: 100%; max-height: none; display: block; }
+    .image-actions { margin-top: .25rem; font-size: .78rem; }
+    .image-actions a { color: #000080; text-decoration: none; }
+    .image-actions a:hover { text-decoration: underline; }
     .post-content { white-space: pre-wrap; word-break: break-word; flex: 1; line-height: 1.5; }
     .quote-link { color: #789922; text-decoration: none; font-weight: bold; }
     .quote-link:hover { text-decoration: underline; }
@@ -45,16 +51,26 @@
 
     .locked-notice { background: #fff0f0; border: 1px solid #c00; border-radius: 4px; padding: .5rem 1rem; margin-bottom: .8rem; color: #c00; font-weight: bold; text-align: center; }
     .pinned-notice { background: #f0fff0; border: 1px solid #2a7; border-radius: 4px; padding: .5rem 1rem; margin-bottom: .8rem; color: #2a7; font-weight: bold; text-align: center; }
+    #thread-subject { display: none; background: #fff; border: 1px solid #FFD3A6; border-radius: 4px; padding: .6rem .8rem; margin-bottom: .8rem; font-size: 1.05rem; font-weight: bold; color: #333; }
 
     .mod-controls { display: none; gap: .5rem; margin-bottom: .8rem; }
-    .mod-controls button { background: #7788aa; color: white; border: none; padding: .4rem .8rem; border-radius: 4px; cursor: pointer; font-size: .85rem; }
-    .mod-controls button:hover { background: #667799; }
+    .mod-controls button { background: #138808; color: white; border: none; padding: .4rem .8rem; border-radius: 4px; cursor: pointer; font-size: .85rem; }
+    .mod-controls button:hover { background: #0d6606; }
+    .thread-tools { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .8rem; }
+    .thread-tools button { background: #fff; color: #000080; border: 1px solid #FF9933; border-radius: 4px; padding: .35rem .7rem; cursor: pointer; font-size: .85rem; }
+    .thread-tools button:hover { background: #F0FFF0; border-color: #138808; }
+    .quote-preview { position: fixed; z-index: 1000; max-width: 320px; background: #fff; border: 1px solid #FF9933; border-radius: 4px; padding: .55rem; box-shadow: 0 4px 16px rgba(0,0,0,.18); font-size: .85rem; display: none; pointer-events: none; }
+    .quote-preview .preview-header { color: #000080; font-weight: bold; margin-bottom: .25rem; }
+    .gallery-box { background: #111; color: white; width: min(960px, 96vw); max-height: 92vh; border-radius: 6px; padding: .7rem; display: flex; flex-direction: column; gap: .5rem; }
+    .gallery-toolbar { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .gallery-toolbar button, .gallery-toolbar a { background: #138808; color: white; border: none; border-radius: 4px; padding: .35rem .65rem; cursor: pointer; text-decoration: none; font-size: .85rem; }
+    .gallery-image { max-width: 100%; max-height: 76vh; object-fit: contain; align-self: center; background: #222; }
 
-    /* Mature image */
+    /* Sensitive image */
     .mature-wrapper { position: relative; display: inline-block; max-width: 150px; }
     .mature-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.75); color: white; font-size: .65rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 2px; z-index: 2; padding: .3rem; line-height: 1.4; }
     .mature-overlay:hover { background: rgba(0,0,0,.88); }
-    .mature-wrapper img { display: block; border-radius: 2px; border: 1px solid #d9bfb7; }
+    .mature-wrapper img { display: block; border-radius: 2px; border: 1px solid #FFD3A6; }
 
     .ban-screen { background: #fff0f0; border: 2px solid #c00; border-radius: 8px; padding: 2rem; margin: 1rem 0; text-align: center; }
     .ban-screen h2 { color: #c00; }
@@ -65,8 +81,16 @@
     .modal-box { background:white;padding:1.5rem;border-radius:8px;min-width:300px;max-width:400px; }
     .modal-box h3 { margin-bottom:1rem; }
 
-    #footer { text-align:center; padding:1rem; font-size:.8rem; color:#999; border-top:1px solid #ccd; margin-top:2rem; }
-    #footer a { color:#7788aa; text-decoration:none; }
+    #footer { text-align:center; padding:1rem; font-size:.8rem; color:#999; border-top:1px solid #FFD3A6; margin-top:2rem; }
+    #footer a { color:#138808; text-decoration:none; }
+    @media (max-width: 640px) {
+      #top-bar { flex-direction: column; align-items: flex-start; gap: .25rem; }
+      #page { padding: .6rem; }
+      .post-body { flex-direction: column; }
+      .post-image img { max-width: 100%; max-height: 260px; }
+      #reply-form-box input[type="text"], #reply-form-box input[type="password"], #reply-form-box textarea { width: 100% !important; }
+      .modal-box { min-width: 0; width: 94vw; }
+    }
   </style>
 </head>
 <body>
@@ -77,13 +101,18 @@
     <a href="/rules.html">Rules</a>
     <a href="/mod.html">Mod Panel</a>
   </div>
-  <div>Nathan's Imageboard — Est. 2026</div>
+  <div>Chat Masala — Est. 2026</div>
 </div>
 
 <div id="page">
-  <div style="margin-bottom:.8rem;margin-top:.8rem"><a href="javascript:history.back()" style="color:#7788aa">← Back</a></div>
+  <div style="margin-bottom:.8rem;margin-top:.8rem"><a href="javascript:history.back()" style="color:#000080">← Back</a></div>
 
   <div id="thread-notices"></div>
+  <div id="thread-subject"></div>
+  <div class="thread-tools">
+    <button type="button" id="watch-thread-btn" onclick="toggleWatchThread()">Watch Thread</button>
+    <button type="button" onclick="openGallery()">Image Gallery</button>
+  </div>
 
   <div id="mod-controls" class="mod-controls">
     <button id="btn-pin" onclick="togglePin()">📌 Pin</button>
@@ -95,6 +124,10 @@
       <strong>Post a Reply</strong>
       <form id="reply-form" enctype="multipart/form-data">
         <div class="form-row" style="margin-bottom:.4rem">
+          <label style="font-size:.85rem">Name</label>
+          <input type="text" name="poster_name" placeholder="Optional, use Name#secret for tripcode" maxlength="80" style="font-size:.85rem;padding:.3rem;border:1px solid #FFD3A6;border-radius:4px;width:260px">
+        </div>
+        <div class="form-row" style="margin-bottom:.4rem">
           <label style="font-size:.85rem">Comment</label>
         </div>
         <textarea name="content" id="reply-content" placeholder="Write your reply..."></textarea>
@@ -104,11 +137,20 @@
         </div>
         <div class="form-row" style="margin-top:.4rem">
           <input type="checkbox" name="image_mature" id="mature-check-reply" value="1">
-          <label for="mature-check-reply" style="font-size:.85rem;color:#c00">⚠️ Mark image as mature (gore/graphic content)</label>
+          <label for="mature-check-reply" style="font-size:.85rem;color:#c00">Mark image as sensitive (non-sexual graphic content)</label>
+        </div>
+        <div class="form-row" style="margin-top:.4rem">
+          <input type="checkbox" name="down_reply" id="down-reply" value="1">
+          <label for="down-reply" style="font-size:.85rem">Down: reply without moving this thread to the top</label>
         </div>
         <div class="form-row" style="margin-top:.4rem">
           <label style="font-size:.85rem">Delete Password</label>
-          <input type="password" name="delete_password" placeholder="Optional — lets you delete later" style="font-size:.85rem;padding:.3rem;border:1px solid #b7c0d8;border-radius:4px;width:220px">
+          <input type="password" name="delete_password" placeholder="Optional — lets you delete later" style="font-size:.85rem;padding:.3rem;border:1px solid #FFD3A6;border-radius:4px;width:220px">
+        </div>
+        <div class="form-row" style="margin-top:.4rem">
+          <label id="reply-captcha-question" style="font-size:.85rem">Loading verification...</label>
+          <input type="text" name="captcha_answer" id="reply-captcha-answer" placeholder="Answer" required style="font-size:.85rem;padding:.3rem;border:1px solid #FFD3A6;border-radius:4px;width:160px">
+          <button type="button" onclick="loadCaptcha('reply')" style="padding:.3rem .6rem">New</button>
         </div>
         <div class="form-row" style="margin-top:.5rem">
           <button type="submit">Post Reply</button>
@@ -130,14 +172,20 @@
       <option value="This post is spam or intentionally made to flood the site">This post is spam or intentionally made to flood the site</option>
       <option value="This post requests, contains, or links to content that violates US law">This post requests, contains, or links to content that violates US law</option>
       <option value="This post contains racism / hateful speech">This post contains racism / hateful speech</option>
-      <option value="This post contains pornography / real gore intended to glorify violence rather than in a documenting / academic manner and is not relevant to the topic at hand">This post contains pornography / real gore intended to glorify violence rather than in a documenting / academic manner and is not relevant to the topic at hand</option>
+      <option value="This post contains forbidden sexual content or graphic violence that is irrelevant, celebratory, threatening, or posted mainly to shock">Forbidden sexual content or abusive graphic violence</option>
       <option value="This post is off topic to the board it is posted">This post is off topic to the board it is posted</option>
       <option value="This post contains copyrighted content">This post contains copyrighted content</option>
       <option value="This user is manipulating staff">This user is manipulating staff</option>
       <option value="This post has malicious links, viruses, or anything intended to harm other users">This post has malicious links, viruses, or anything intended to harm other users</option>
       <option value="This post is a dox thread / attempting to get personal information about other users or people">This post is a dox thread / attempting to get personal information about other users or people</option>
+      <option value="I want my post deleted, but I forgot to set up a delete password.">I want my post deleted, but I forgot to set up a delete password.</option>
     </select>
     <input id="report-other" placeholder="Additional details (optional)" style="width:100%;margin-bottom:.7rem;display:block;box-sizing:border-box">
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.7rem">
+      <label id="report-captcha-question" style="font-size:.85rem">Loading verification...</label>
+      <input id="report-captcha-answer" placeholder="Answer" style="font-size:.85rem;padding:.3rem;border:1px solid #ccc;border-radius:4px;width:160px">
+      <button onclick="loadCaptcha('report')" type="button">New</button>
+    </div>
     <div style="display:flex;gap:.5rem">
       <button onclick="submitReport()">Submit Report</button>
       <button onclick="closeReportModal()">Cancel</button>
@@ -164,41 +212,135 @@
   <a href="/">Home</a> — <a href="/rules.html">Rules</a>
 </div>
 
+<div id="quote-preview" class="quote-preview"></div>
+
+<div id="gallery-modal" class="overlay" style="display:none">
+  <div class="gallery-box">
+    <div class="gallery-toolbar">
+      <div id="gallery-count">Image 1 of 1</div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+        <button type="button" onclick="galleryPrev()">Prev</button>
+        <button type="button" onclick="galleryNext()">Next</button>
+        <a id="gallery-open" href="#" target="_blank" rel="noopener">Open</a>
+        <button type="button" onclick="closeGallery()">Close</button>
+      </div>
+    </div>
+    <img id="gallery-image" class="gallery-image" alt="">
+  </div>
+</div>
+
 <script>
   const id = new URLSearchParams(location.search).get('id');
   let reportTargetPostId = null;
   let deleteTargetPostId = null;
   let threadData = null;
   let boardSlug = '';
+  let csrfToken = '';
+  let postCache = new Map();
+  let galleryImages = [];
+  let galleryIndex = 0;
+  const watchedThreadsKey = 'chatmasala_watched_threads';
+  const myPostsKey = 'chatmasala_my_posts';
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function readStoredIds(key) {
+    try {
+      const ids = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(ids) ? ids.map(Number).filter(Boolean) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeStoredIds(key, ids) {
+    localStorage.setItem(key, JSON.stringify([...new Set(ids.map(Number).filter(Boolean))].slice(0, 120)));
+  }
+
+  function rememberMyPost(postId, threadId) {
+    writeStoredIds(myPostsKey, [postId, ...readStoredIds(myPostsKey)]);
+    writeStoredIds(watchedThreadsKey, [threadId, ...readStoredIds(watchedThreadsKey)]);
+    updateWatchButton();
+  }
+
+  function updateWatchButton() {
+    const btn = document.getElementById('watch-thread-btn');
+    if (!btn) return;
+    const watched = readStoredIds(watchedThreadsKey).includes(Number(id));
+    btn.textContent = watched ? 'Unwatch Thread' : 'Watch Thread';
+  }
+
+  function toggleWatchThread() {
+    const ids = readStoredIds(watchedThreadsKey);
+    const threadId = Number(id);
+    writeStoredIds(watchedThreadsKey, ids.includes(threadId) ? ids.filter(item => item !== threadId) : [threadId, ...ids]);
+    updateWatchButton();
+  }
+
+  async function loadCsrfToken() {
+    const res = await fetch('/api/csrf-token');
+    if (!res.ok) return;
+    const data = await res.json();
+    csrfToken = data.csrfToken;
+  }
+
+  async function staffFetch(url, options = {}) {
+    if (!csrfToken) await loadCsrfToken();
+    const headers = new Headers(options.headers || {});
+    headers.set('CSRF-Token', csrfToken);
+    return fetch(url, { ...options, headers });
+  }
+
+  async function loadCaptcha(prefix) {
+    const res = await fetch('/api/captcha');
+    const data = await res.json();
+    const question = document.getElementById(`${prefix}-captcha-question`);
+    const answer = document.getElementById(`${prefix}-captcha-answer`);
+    if (question) question.textContent = data.question;
+    if (answer) answer.value = '';
+  }
 
   function showBanScreen(data) {
     const scopeMsg = data.ban_scope === 'board'
-      ? `You are banned from /${data.ban_board}/.`
+      ? `You are banned from /${escapeHtml(data.ban_board)}/.`
       : 'You are banned from all boards.';
     document.getElementById('reply-area').innerHTML = `
       <div class="ban-screen">
         <div style="font-size:2rem">🔨</div>
         <h2>You are banned</h2>
         <p><strong>${scopeMsg}</strong></p>
-        <p><strong>Reason:</strong> ${data.reason || 'No reason given'}</p>
+        <p><strong>Reason:</strong> ${escapeHtml(data.reason || 'No reason given')}</p>
         <p style="color:#666">${data.expires === 'Permanent' ? 'This ban is permanent.' : 'Expires: ' + new Date(data.expires).toLocaleString()}</p>
         ${(data.post_content || data.post_image) ? `
           <div class="ban-post">
             <p class="label">Your rule-breaking post:</p>
             ${data.post_image ? `<img src="/uploads/${data.post_image}" style="max-width:200px;display:block;margin-bottom:.5rem;border-radius:4px">` : ''}
-            ${data.post_content ? `<p style="white-space:pre-wrap">${data.post_content}</p>` : ''}
+            ${data.post_content ? `<p style="white-space:pre-wrap">${escapeHtml(data.post_content)}</p>` : ''}
           </div>` : ''}
         <div style="margin-top:1.5rem;background:#fff;border:1px solid #faa;border-radius:6px;padding:1rem;text-align:left">
           <strong style="color:#c00">Appeal this ban</strong>
           <p style="font-size:.85rem;color:#666;margin:.4rem 0 .7rem">Explain why you believe this ban was issued in error.</p>
           <textarea id="appeal-text" placeholder="Write your appeal..." style="width:100%;height:80px;resize:vertical;padding:.4rem;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box"></textarea>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+            <label id="appeal-captcha-question" style="font-size:.85rem">Loading verification...</label>
+            <input id="appeal-captcha-answer" placeholder="Answer" style="font-size:.85rem;padding:.3rem;border:1px solid #ccc;border-radius:4px;width:160px">
+            <button onclick="loadCaptcha('appeal')" style="background:#138808;color:white;border:none;padding:.3rem .6rem;border-radius:4px;cursor:pointer" type="button">New</button>
+          </div>
           <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center">
-            <button onclick="submitAppeal()" style="background:#7788aa;color:white;border:none;padding:.4rem 1rem;border-radius:4px;cursor:pointer">Submit Appeal</button>
+            <button onclick="submitAppeal()" style="background:#138808;color:white;border:none;padding:.4rem 1rem;border-radius:4px;cursor:pointer">Submit Appeal</button>
             <span id="appeal-status" style="font-size:.85rem"></span>
           </div>
         </div>
         <p style="color:#666;margin-top:1rem">Your IP address has been banned.</p>
       </div>`;
+    loadCaptcha('appeal');
   }
 
   async function submitAppeal() {
@@ -208,7 +350,11 @@
     const res = await fetch('/api/appeals', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({
+        message,
+        board_slug: boardSlug,
+        captcha_answer: document.getElementById('appeal-captcha-answer')?.value || ''
+      })
     });
     const data = await res.json();
     if (res.ok) {
@@ -219,6 +365,7 @@
     } else {
       status.textContent = data.error || 'Failed to submit appeal.';
       status.style.color = 'red';
+      loadCaptcha('appeal');
     }
   }
 
@@ -228,6 +375,7 @@
     document.getElementById('report-other').value = '';
     document.getElementById('report-error').textContent = '';
     document.getElementById('report-modal').style.display = 'flex';
+    loadCaptcha('report');
   }
 
   function closeReportModal() {
@@ -243,10 +391,15 @@
     const res = await fetch('/api/reports', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post_id: reportTargetPostId, reason: fullReason })
+      body: JSON.stringify({
+        post_id: reportTargetPostId,
+        reason: fullReason,
+        captcha_answer: document.getElementById('report-captcha-answer').value
+      })
     });
-    if (res.ok) { closeReportModal(); alert('Report submitted. Thank you.'); }
-    else { document.getElementById('report-error').textContent = 'Failed to submit report.'; }
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) { closeReportModal(); alert('Report submitted. Thank you.'); loadCaptcha('report'); }
+    else { document.getElementById('report-error').textContent = data.error || 'Failed to submit report.'; loadCaptcha('report'); }
   }
 
   function openDeleteModal(postId) {
@@ -296,6 +449,27 @@
     setTimeout(() => el.classList.remove('highlight'), 1500);
   }
 
+  function renderPreviewContent(content) {
+    return escapeHtml(content || '').slice(0, 260).replace(/\n/g, '<br>');
+  }
+
+  function showQuotePreview(event, postId) {
+    const post = postCache.get(Number(postId));
+    const preview = document.getElementById('quote-preview');
+    if (!post || !preview) return;
+    preview.innerHTML = `
+      <div class="preview-header">No.${post.id}</div>
+      <div>${renderPreviewContent(post.content)}</div>`;
+    preview.style.left = `${Math.min(event.clientX + 14, window.innerWidth - 340)}px`;
+    preview.style.top = `${Math.min(event.clientY + 14, window.innerHeight - 180)}px`;
+    preview.style.display = 'block';
+  }
+
+  function hideQuotePreview() {
+    const preview = document.getElementById('quote-preview');
+    if (preview) preview.style.display = 'none';
+  }
+
   function toggleImage(img) {
     img.classList.toggle('expanded');
     const postBody = img.closest('.post-body');
@@ -336,42 +510,92 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/^(&gt;&gt;\d+)/gm, (match, ref) => {
         const num = ref.replace(/&gt;&gt;/g, '');
-        return `<a class="quote-link" onclick="highlightPost(${num})">&gt;&gt;${num}</a>`;
+        return `<a class="quote-link" href="#post-${num}" onclick="highlightPost(${num})" onmouseenter="showQuotePreview(event, ${num})" onmouseleave="hideQuotePreview()">&gt;&gt;${num}</a>`;
       })
       .replace(/^(&gt;(?!&gt;).+)/gm, '<span class="greentext">$1</span>');
   }
 
   function renderImage(p) {
     if (!p.image_path) return '';
+    const file = encodeURIComponent(p.image_path);
+    const viewerUrl = `/image.html?file=${file}`;
     if (p.image_mature) {
       return `
         <div class="post-image">
           <div class="mature-wrapper" id="mature-${p.id}">
             <div class="mature-overlay" onclick="revealMature(${p.id})">
-              ⚠️ THIS IMAGE IS MARKED AS MATURE<br>VIEWER DISCRETION ADVISED<br>
+              THIS IMAGE IS MARKED SENSITIVE<br>VIEWER DISCRETION ADVISED<br>
               <span style="font-size:.7rem;opacity:.8;margin-top:.3rem;display:block">Click to reveal</span>
             </div>
-            <img src="/uploads/${p.image_path}"
+            <img src="/uploads/${file}"
               style="max-width:150px;max-height:150px;filter:blur(12px);pointer-events:none"
-              title="Mature image">
+              title="Sensitive image">
           </div>
+          <div class="image-actions"><a href="${viewerUrl}" target="_blank" rel="noopener">Open image</a></div>
         </div>`;
     }
     return `
       <div class="post-image">
-        <img src="/uploads/${p.image_path}" onclick="toggleImage(this)" title="Click to expand">
+        <img src="/uploads/${file}" onclick="toggleImage(this)" title="Click to expand">
+        <div class="image-actions"><a href="${viewerUrl}" target="_blank" rel="noopener">Open image</a></div>
       </div>`;
+  }
+
+  function renderPosterName(post) {
+    if (post.staff_role) {
+      const role = post.staff_role.charAt(0).toUpperCase() + post.staff_role.slice(1);
+      return `<span class="staff-${escapeHtml(post.staff_role)}">## ${escapeHtml(role)} ${escapeHtml(post.staff_name)}</span>`;
+    }
+
+    const name = post.poster_name || 'Anonymous';
+    const trip = post.tripcode ? ` <span class="tripcode">!${escapeHtml(post.tripcode)}</span>` : '';
+    return `<span class="postname">${escapeHtml(name)}${trip}</span>`;
+  }
+
+  function openGallery(index = 0) {
+    if (!galleryImages.length) {
+      alert('No images in this thread.');
+      return;
+    }
+    galleryIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
+    document.getElementById('gallery-modal').style.display = 'flex';
+    renderGallery();
+  }
+
+  function closeGallery() {
+    document.getElementById('gallery-modal').style.display = 'none';
+  }
+
+  function renderGallery() {
+    const item = galleryImages[galleryIndex];
+    const file = encodeURIComponent(item.image_path);
+    document.getElementById('gallery-image').src = `/uploads/${file}`;
+    document.getElementById('gallery-count').textContent = `Image ${galleryIndex + 1} of ${galleryImages.length} - No.${item.id}`;
+    document.getElementById('gallery-open').href = `/image.html?file=${file}`;
+  }
+
+  function galleryPrev() {
+    if (!galleryImages.length) return;
+    galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+    renderGallery();
+  }
+
+  function galleryNext() {
+    if (!galleryImages.length) return;
+    galleryIndex = (galleryIndex + 1) % galleryImages.length;
+    renderGallery();
   }
 
   function loadPosts() {
     fetch(`/api/threads/${id}/posts`).then(r => r.json()).then(posts => {
+      postCache = new Map(posts.map(p => [Number(p.id), p]));
+      galleryImages = posts.filter(p => p.image_path);
       document.getElementById('posts').innerHTML = posts.map((p) => `
         <div class="post" id="post-${p.id}">
           <div class="post-header">
-            ${p.staff_role
-              ? `<span class="staff-${p.staff_role}">## ${p.staff_role.charAt(0).toUpperCase() + p.staff_role.slice(1)} ${p.staff_name}</span>`
-              : `<span class="postname">Anonymous</span>`}
+            ${renderPosterName(p)}
             ${p.country && boardSlug === 'pol' ? `<img src="https://flagcdn.com/16x12/${p.country.toLowerCase()}.png" title="${p.country}" style="margin:0 .2rem;vertical-align:middle">` : ''}
+            ${p.down_reply ? '<span class="down-badge">Down</span>' : ''}
             <span class="postnum">No.${p.id}</span>
             <button class="reply-btn" onclick="quotePost(${p.id})">Reply</button>
             <button class="report-btn" onclick="openReportModal(${p.id})">Report</button>
@@ -387,14 +611,14 @@
   }
 
   async function togglePin() {
-    const res = await fetch(`/api/mod/threads/${id}/pin`, { method: 'POST' });
+    const res = await staffFetch(`/api/mod/threads/${id}/pin`, { method: 'POST' });
     const data = await res.json();
     document.getElementById('btn-pin').textContent = data.pinned ? '📌 Unpin' : '📌 Pin';
     location.reload();
   }
 
   async function toggleLock() {
-    const res = await fetch(`/api/mod/threads/${id}/lock`, { method: 'POST' });
+    const res = await staffFetch(`/api/mod/threads/${id}/lock`, { method: 'POST' });
     const data = await res.json();
     document.getElementById('btn-lock').textContent = data.locked ? '🔒 Unlock' : '🔒 Lock';
     location.reload();
@@ -403,6 +627,12 @@
   fetch(`/api/threads/${id}/info`).then(r => r.json()).then(thread => {
     threadData = thread;
     boardSlug = thread.board_slug;
+    if (thread.subject && thread.subject.trim()) {
+      const subject = document.getElementById('thread-subject');
+      subject.textContent = thread.subject;
+      subject.style.display = 'block';
+      document.title = `${thread.subject} - /${thread.board_slug}/`;
+    }
     const notices = document.getElementById('thread-notices');
     if (thread.pinned) notices.innerHTML += `<div class="pinned-notice">📌 This thread is pinned</div>`;
     if (thread.locked) {
@@ -413,10 +643,16 @@
         if (thread.locked) document.getElementById('reply-form-box').style.display = 'none';
         return;
       }
-      const controls = document.getElementById('mod-controls');
-      controls.style.display = 'flex';
-      document.getElementById('btn-pin').textContent = thread.pinned ? '📌 Unpin' : '📌 Pin';
-      document.getElementById('btn-lock').textContent = thread.locked ? '🔒 Unlock' : '🔒 Lock';
+      loadCsrfToken();
+      if (staff.role === 'admin' || staff.role === 'moderator') {
+        const controls = document.getElementById('mod-controls');
+        controls.style.display = 'flex';
+        document.getElementById('btn-pin').textContent = thread.pinned ? 'Unpin' : 'Pin';
+        document.getElementById('btn-lock').textContent = thread.locked ? 'Unlock' : 'Lock';
+      }
+    });
+    fetch(`/api/ban-check?board=${encodeURIComponent(boardSlug)}`).then(res => {
+      if (res.status === 403) res.json().then(showBanScreen);
     });
   });
 
@@ -435,15 +671,23 @@
       showBanScreen(data);
       return;
     }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Failed to post reply.');
+      loadCaptcha('reply');
+      return;
+    }
+    const data = await res.json().catch(() => ({}));
+    if (data.postId) rememberMyPost(data.postId, Number(id));
     e.target.reset();
+    loadCaptcha('reply');
     loadPosts();
   };
 
-  fetch('/api/ban-check').then(res => {
-    if (res.status === 403) res.json().then(showBanScreen);
-  });
-
+  updateWatchButton();
   loadPosts();
+  loadCaptcha('reply');
+  loadCaptcha('report');
 </script>
 </body>
 </html>

@@ -5,43 +5,55 @@
   <title>Board</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #eef2ff; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; }
+    body { background: #FFF8F0; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; }
 
-    #top-bar { background: #7788aa; color: white; padding: .35rem 1rem; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; }
-    #top-bar a { color: #dde; text-decoration: none; margin: 0 .4rem; }
+    #top-bar { background: #FF9933; color: white; padding: .35rem 1rem; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; }
+    #top-bar a { color: #fff7ef; text-decoration: none; margin: 0 .4rem; }
     #top-bar a:hover { text-decoration: underline; }
 
-    #board-header { background: #d6daf0; border-bottom: 1px solid #b7c0d8; padding: 1rem; text-align: center; }
+    #board-header { background: #fff; border-bottom: 2px solid #FF9933; padding: 1rem; text-align: center; }
     #board-header h1 { font-size: 1.6rem; color: #444; font-style: italic; }
 
     #page { max-width: 800px; margin: 0 auto; padding: 1rem; }
 
-    #new-thread-box { background: #d6daf0; border: 1px solid #b7c0d8; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
-    #new-thread-box input[type="text"], #new-thread-box textarea { width: 100%; padding: .4rem; border: 1px solid #b7c0d8; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+    #new-thread-box { background: #fff; border: 1px solid #FF9933; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
+    #new-thread-box input[type="text"], #new-thread-box textarea { width: 100%; padding: .4rem; border: 1px solid #FFD3A6; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
     #new-thread-box textarea { height: 80px; resize: vertical; }
-    #new-thread-box button { align-self: flex-start; background: #7788aa; color: white; border: none; padding: .4rem 1rem; border-radius: 4px; cursor: pointer; }
-    #new-thread-box button:hover { background: #667799; }
+    #new-thread-box button { align-self: flex-start; background: #138808; color: white; border: none; padding: .4rem 1rem; border-radius: 4px; cursor: pointer; }
+    #new-thread-box button:hover { background: #0d6606; }
+    .board-tools { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .board-tools input { flex: 1; min-width: 220px; padding: .4rem; border: 1px solid #FFD3A6; border-radius: 4px; font-family: inherit; font-size: 14px; }
+    .board-tools a, .board-tools button { background: #fff; color: #000080; border: 1px solid #FF9933; border-radius: 4px; padding: .4rem .7rem; text-decoration: none; cursor: pointer; font-size: 14px; }
+    .board-tools a:hover, .board-tools button:hover { background: #F0FFF0; border-color: #138808; }
 
-    .thread-card { background: #f0e0d6; border: 1px solid #d9bfb7; border-radius: 4px; margin-bottom: .8rem; padding: .6rem; display: flex; gap: .8rem; align-items: flex-start; }
-    .thread-card img { max-width: 120px; max-height: 120px; object-fit: cover; border-radius: 3px; border: 1px solid #d9bfb7; flex-shrink: 0; }
+    .thread-card { background: #fff; border: 1px solid #FFD3A6; border-radius: 4px; margin-bottom: .8rem; padding: .6rem; display: flex; gap: .8rem; align-items: flex-start; }
+    .thread-card img { max-width: 120px; max-height: 120px; object-fit: cover; border-radius: 3px; border: 1px solid #FFD3A6; flex-shrink: 0; }
     .thread-info { flex: 1; }
     .thread-subject { font-weight: bold; color: #333; margin-bottom: .2rem; }
     .thread-snippet { color: #555; white-space: pre-wrap; word-break: break-word; font-size: .9rem; }
     .thread-meta { font-size: .8rem; color: #888; margin-top: .3rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
-    .thread-meta a { color: #7788aa; text-decoration: none; }
+    .thread-meta a { color: #000080; text-decoration: none; }
     .thread-meta a:hover { text-decoration: underline; }
     .badge-pinned { color: #2a7; font-weight: bold; }
     .badge-locked { color: #c00; font-weight: bold; }
+    .postname { font-weight: bold; color: #117743; }
+    .tripcode { color: #000080; font-weight: normal; }
     .staff-admin { font-weight: bold; color: #cc0000; }
+    .staff-moderator { font-weight: bold; color: #075985; }
     .staff-janitor { font-weight: bold; color: #117743; }
+
+    .reply-preview { margin-top: .6rem; border-top: 1px solid #FFD3A6; padding-top: .5rem; display: flex; flex-direction: column; gap: .4rem; }
+    .reply-preview-item { font-size: .82rem; color: #555; display: flex; gap: .5rem; align-items: flex-start; background: #F0FFF0; border-radius: 3px; padding: .3rem .4rem; }
+    .reply-preview-item img { max-width: 50px; max-height: 50px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+    .reply-preview-item span { white-space: pre-wrap; word-break: break-word; }
 
     .ban-screen { background: #fff0f0; border: 2px solid #c00; border-radius: 8px; padding: 2rem; margin: 1rem 0; text-align: center; }
     .ban-screen h2 { color: #c00; margin-bottom: .5rem; }
     .ban-post { background: #fff; border: 1px solid #c00; border-radius: 6px; padding: 1rem; margin-top: 1rem; text-align: left; }
     .ban-post p.label { color: #c00; font-weight: bold; margin-bottom: .5rem; }
 
-    #footer { text-align: center; padding: 1rem; font-size: .8rem; color: #999; border-top: 1px solid #ccd; margin-top: 2rem; }
-    #footer a { color: #7788aa; text-decoration: none; }
+    #footer { text-align: center; padding: 1rem; font-size: .8rem; color: #999; border-top: 1px solid #FFD3A6; margin-top: 2rem; }
+    #footer a { color: #138808; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -52,7 +64,7 @@
     <a href="/rules.html">Rules</a>
     <a href="/mod.html">Mod Panel</a>
   </div>
-  <div>Nathan's Imageboard — Est. 2026</div>
+  <div>Chat Masala — Est. 2026</div>
 </div>
 
 <div id="board-header">
@@ -66,6 +78,7 @@
     <div id="new-thread-box">
       <strong>New Thread</strong>
       <form id="new-thread" enctype="multipart/form-data">
+        <input type="text" name="poster_name" placeholder="Name (optional, use Name#secret for tripcode)" maxlength="80" style="margin-bottom:.4rem">
         <input type="text" name="subject" placeholder="Subject (optional)" style="margin-bottom:.4rem">
         <textarea name="content" placeholder="Post content..." required></textarea>
         <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap">
@@ -74,13 +87,18 @@
         </div>
         <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem">
           <input type="checkbox" name="image_mature" id="mature-check-thread" value="1">
-          <label for="mature-check-thread" style="font-size:.85rem;color:#c00">⚠️ Mark image as mature (gore/graphic content)</label>
+          <label for="mature-check-thread" style="font-size:.85rem;color:#c00">Mark image as sensitive (non-sexual graphic content)</label>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap">
+          <label style="font-size:.85rem">Delete Password</label>
+          <input type="password" name="delete_password" placeholder="Optional — lets you delete later" style="font-size:.85rem;padding:.3rem;border:1px solid #FFD3A6;border-radius:4px;width:220px">
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap">
+          <label id="thread-captcha-question" style="font-size:.85rem">Loading verification...</label>
+          <input type="text" name="captcha_answer" id="thread-captcha-answer" placeholder="Answer" required style="font-size:.85rem;padding:.3rem;border:1px solid #FFD3A6;border-radius:4px;width:160px">
+          <button type="button" onclick="loadCaptcha('thread')" style="padding:.3rem .6rem">New</button>
         </div>
         <div style="margin-top:.4rem">
-          <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap">
-            <label style="font-size:.85rem">Delete Password</label>
-              <input type="password" name="delete_password" placeholder="Optional — lets you delete later" style="font-size:.85rem;padding:.3rem;border:1px solid #b7c0d8;border-radius:4px;width:220px">
-            </div>
           <button type="submit">Post Thread</button>
         </div>
       </form>
@@ -88,6 +106,11 @@
   </div>
 
   <div id="ban-screen-area"></div>
+  <div class="board-tools">
+    <input id="thread-filter" type="text" placeholder="Filter visible threads...">
+    <a id="catalog-link" href="#">Catalog</a>
+    <button type="button" onclick="loadThreads()">Refresh</button>
+  </div>
   <div id="threads"></div>
 </div>
 
@@ -97,6 +120,45 @@
 
 <script>
   const slug = new URLSearchParams(location.search).get('slug');
+  let allThreads = [];
+  const watchedThreadsKey = 'chatmasala_watched_threads';
+  const myPostsKey = 'chatmasala_my_posts';
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function readStoredIds(key) {
+    try {
+      const ids = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(ids) ? ids.map(Number).filter(Boolean) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeStoredIds(key, ids) {
+    localStorage.setItem(key, JSON.stringify([...new Set(ids.map(Number).filter(Boolean))].slice(0, 120)));
+  }
+
+  function rememberMyPost(postId, threadId) {
+    writeStoredIds(myPostsKey, [postId, ...readStoredIds(myPostsKey)]);
+    writeStoredIds(watchedThreadsKey, [threadId, ...readStoredIds(watchedThreadsKey)]);
+  }
+
+  async function loadCaptcha(prefix) {
+    const res = await fetch('/api/captcha');
+    const data = await res.json();
+    const question = document.getElementById(`${prefix}-captcha-question`);
+    const answer = document.getElementById(`${prefix}-captcha-answer`);
+    if (question) question.textContent = data.question;
+    if (answer) answer.value = '';
+  }
 
   fetch('/api/boards').then(r => r.json()).then(boards => {
     const board = boards.find(b => b.slug === slug);
@@ -106,6 +168,18 @@
       document.getElementById('board-desc').textContent = board.description || '';
     }
   });
+  document.getElementById('catalog-link').href = `/catalog.html?slug=${encodeURIComponent(slug)}`;
+
+  function renderPosterName(post) {
+    if (post.staff_role) {
+      const role = post.staff_role.charAt(0).toUpperCase() + post.staff_role.slice(1);
+      return `<span class="staff-${escapeHtml(post.staff_role)}">## ${escapeHtml(role)} ${escapeHtml(post.staff_name)}</span>`;
+    }
+
+    const name = post.poster_name || 'Anonymous';
+    const trip = post.tripcode ? ` <span class="tripcode">!${escapeHtml(post.tripcode)}</span>` : '';
+    return `<span class="postname">${escapeHtml(name)}${trip}</span>`;
+  }
 
   function showBanScreen(data) {
     document.getElementById('post-form').style.display = 'none';
@@ -113,26 +187,32 @@
       <div class="ban-screen">
         <div style="font-size:2rem">🔨</div>
         <h2>You are banned</h2>
-        <p><strong>${data.ban_scope === 'board' ? `You are banned from /${data.ban_board}/.` : 'You are banned from all boards.'}</strong></p>
-        <p><strong>Reason:</strong> ${data.reason || 'No reason given'}</p>
+        <p><strong>${data.ban_scope === 'board' ? `You are banned from /${escapeHtml(data.ban_board)}/.` : 'You are banned from all boards.'}</strong></p>
+        <p><strong>Reason:</strong> ${escapeHtml(data.reason || 'No reason given')}</p>
         <p style="color:#666;margin-top:.3rem">${data.expires === 'Permanent' ? 'This ban is permanent.' : 'Expires: ' + new Date(data.expires).toLocaleString()}</p>
         ${(data.post_content || data.post_image) ? `
           <div class="ban-post">
             <p class="label">Your rule-breaking post:</p>
             ${data.post_image ? `<img src="/uploads/${data.post_image}" style="max-width:200px;display:block;margin-bottom:.5rem;border-radius:4px">` : ''}
-            ${data.post_content ? `<p style="white-space:pre-wrap">${data.post_content}</p>` : ''}
+            ${data.post_content ? `<p style="white-space:pre-wrap">${escapeHtml(data.post_content)}</p>` : ''}
           </div>` : ''}
         <div style="margin-top:1.5rem;background:#fff;border:1px solid #faa;border-radius:6px;padding:1rem;text-align:left">
           <strong style="color:#c00">Appeal this ban</strong>
           <p style="font-size:.85rem;color:#666;margin:.4rem 0 .7rem">Explain why you believe this ban was issued in error.</p>
           <textarea id="appeal-text" placeholder="Write your appeal..." style="width:100%;height:80px;resize:vertical;padding:.4rem;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box"></textarea>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+            <label id="appeal-captcha-question" style="font-size:.85rem">Loading verification...</label>
+            <input id="appeal-captcha-answer" placeholder="Answer" style="font-size:.85rem;padding:.3rem;border:1px solid #ccc;border-radius:4px;width:160px">
+            <button onclick="loadCaptcha('appeal')" style="background:#138808;color:white;border:none;padding:.3rem .6rem;border-radius:4px;cursor:pointer" type="button">New</button>
+          </div>
           <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center">
-            <button onclick="submitAppeal()" style="background:#7788aa;color:white;border:none;padding:.4rem 1rem;border-radius:4px;cursor:pointer">Submit Appeal</button>
+            <button onclick="submitAppeal()" style="background:#138808;color:white;border:none;padding:.4rem 1rem;border-radius:4px;cursor:pointer">Submit Appeal</button>
             <span id="appeal-status" style="font-size:.85rem"></span>
           </div>
         </div>
         <p style="color:#666;margin-top:1rem">Your IP address has been banned.</p>
       </div>`;
+    loadCaptcha('appeal');
   }
 
   async function submitAppeal() {
@@ -142,7 +222,11 @@
     const res = await fetch('/api/appeals', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({
+        message,
+        board_slug: slug,
+        captcha_answer: document.getElementById('appeal-captcha-answer').value
+      })
     });
     const data = await res.json();
     if (res.ok) {
@@ -153,42 +237,69 @@
     } else {
       status.textContent = data.error || 'Failed to submit appeal.';
       status.style.color = 'red';
+      loadCaptcha('appeal');
     }
   }
 
   function loadThreads() {
     fetch(`/api/boards/${slug}/threads`).then(r => r.json()).then(threads => {
-      if (!threads.length) {
-        document.getElementById('threads').innerHTML = '<p style="color:#999">No threads yet. Be the first to post!</p>';
-        return;
-      }
-      document.getElementById('threads').innerHTML = threads.map(t => `
-        <div class="thread-card">
-          ${t.image_path
-              ? t.image_mature
-                  ? `<div style="position:relative;width:120px;height:120px;flex-shrink:0">
-                <div onclick="location.href='/thread.html?id=${t.id}'" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);color:white;font-size:.6rem;font-weight:bold;text-align:center;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:3px;z-index:2;padding:.3rem;line-height:1.4">⚠️ MATURE<br>VIEWER DISCRETION<br><span style="font-size:.6rem;opacity:.8">Click to view thread</span></div>
-                <img src="/uploads/${t.image_path}" style="width:120px;height:120px;object-fit:cover;border-radius:3px;border:1px solid #d9bfb7;filter:blur(8px)">
-                  </div>`
-              : `<img src="/uploads/${t.image_path}">`
-                : ''}
-          <div class="thread-info">
-            <div class="thread-meta">
-              ${t.pinned ? `<span class="badge-pinned">📌 Pinned</span>` : ''}
-              ${t.locked ? `<span class="badge-locked">🔒 Locked</span>` : ''}
-            </div>
-            ${t.subject ? `<div class="thread-subject">${t.subject}</div>` : ''}
-            <div class="thread-snippet">${t.content ? t.content.substring(0, 200) + (t.content.length > 200 ? '…' : '') : ''}</div>
-            <div class="thread-meta" style="margin-top:.4rem">
-              ${t.staff_role
-                ? `<span class="staff-${t.staff_role}">## ${t.staff_role.charAt(0).toUpperCase() + t.staff_role.slice(1)} ${t.staff_name}</span>`
-                : ''}
-              <a href="/thread.html?id=${t.id}">[Reply]</a>
-            </div>
-          </div>
-        </div>`).join('');
+      allThreads = threads;
+      renderThreads();
     });
   }
+
+  function renderThreads() {
+      const filter = document.getElementById('thread-filter').value.trim().toLowerCase();
+      const threads = allThreads.filter(t => {
+        if (!filter) return true;
+        return String(t.subject || '').toLowerCase().includes(filter)
+          || String(t.content || '').toLowerCase().includes(filter);
+      });
+      if (!threads.length) {
+        document.getElementById('threads').innerHTML = `<p style="color:#999">${allThreads.length ? 'No matching threads.' : 'No threads yet. Be the first to post!'}</p>`;
+        return;
+      }
+
+      document.getElementById('threads').innerHTML = threads.map(t => {
+        const threadImage = t.image_path ? encodeURIComponent(t.image_path) : '';
+        const replies = (t.preview_replies || []).filter(r => r.id !== t.id);
+        const replyPreviewHtml = replies.length ? `
+          <div class="reply-preview">
+            ${replies.map(r => `
+              <div class="reply-preview-item">
+                ${r.image_path ? `<img src="/uploads/${encodeURIComponent(r.image_path)}" style="${r.image_mature ? 'filter:blur(4px)' : ''}">` : ''}
+                <span>${r.content ? escapeHtml(r.content.substring(0, 150)) + (r.content.length > 150 ? '...' : '') : ''}</span>
+              </div>`).join('')}
+          </div>` : '';
+
+        return `
+          <div class="thread-card">
+            ${t.image_path
+              ? t.image_mature
+                ? `<div style="position:relative;width:120px;height:120px;flex-shrink:0">
+                     <div onclick="location.href='/thread.html?id=${t.id}'" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);color:white;font-size:.6rem;font-weight:bold;text-align:center;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:3px;z-index:2;padding:.3rem;line-height:1.4">SENSITIVE IMAGE<br>VIEWER DISCRETION<br><span style="font-size:.6rem;opacity:.8">Click to view thread</span></div>
+                     <img src="/uploads/${threadImage}" style="width:120px;height:120px;object-fit:cover;border-radius:3px;border:1px solid #FFD3A6;filter:blur(8px)">
+                   </div>`
+                : `<img src="/uploads/${threadImage}">`
+              : ''}
+            <div class="thread-info">
+              <div class="thread-meta">
+                ${t.pinned ? `<span class="badge-pinned">📌 Pinned</span>` : ''}
+                ${t.locked ? `<span class="badge-locked">🔒 Locked</span>` : ''}
+              </div>
+              ${t.subject ? `<div class="thread-subject">${escapeHtml(t.subject)}</div>` : ''}
+              <div class="thread-snippet">${t.content ? escapeHtml(t.content.substring(0, 200)) + (t.content.length > 200 ? '...' : '') : ''}</div>
+              ${replyPreviewHtml}
+              <div class="thread-meta" style="margin-top:.4rem">
+                ${renderPosterName(t)}
+                <a href="/thread.html?id=${t.id}">[Reply]</a>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+  }
+
+  document.getElementById('thread-filter').addEventListener('input', renderThreads);
 
   document.getElementById('new-thread').onsubmit = async (e) => {
     e.preventDefault();
@@ -200,15 +311,25 @@
       showBanScreen(await res.json());
       return;
     }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Failed to post thread.');
+      loadCaptcha('thread');
+      return;
+    }
+    const data = await res.json().catch(() => ({}));
+    if (data.postId && data.threadId) rememberMyPost(data.postId, data.threadId);
     e.target.reset();
+    loadCaptcha('thread');
     loadThreads();
   };
 
-  fetch('/api/ban-check').then(res => {
+  fetch(`/api/ban-check?board=${encodeURIComponent(slug)}`).then(res => {
     if (res.status === 403) res.json().then(showBanScreen);
   });
 
   loadThreads();
+  loadCaptcha('thread');
 </script>
 </body>
 </html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Catalog</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #FFF8F0; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; }
+    #top-bar { background: #FF9933; color: white; padding: .35rem 1rem; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; }
+    #top-bar a { color: #fff7ef; text-decoration: none; margin: 0 .4rem; }
+    #top-bar a:hover { text-decoration: underline; }
+    #page { max-width: 1100px; margin: 0 auto; padding: 1rem; }
+    #header { display: flex; justify-content: space-between; gap: .7rem; align-items: center; flex-wrap: wrap; margin: .6rem 0 1rem; }
+    #header h1 { font-size: 1.3rem; color: #444; font-style: italic; }
+    .catalog-controls { display: flex; gap: .5rem; align-items: center; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+    #filter, #sort { min-width: 180px; padding: .45rem; border: 1px solid #FFD3A6; border-radius: 4px; font-family: inherit; }
+    #filter { flex: 1; max-width: 420px; }
+    #catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .7rem; }
+    .tile { background: #fff; border: 1px solid #FFD3A6; border-radius: 4px; padding: .55rem; color: inherit; text-decoration: none; min-height: 230px; }
+    .tile:hover { background: #F0FFF0; border-color: #138808; }
+    .thumb { width: 100%; aspect-ratio: 1 / 1; background: #fff8f0; border: 1px solid #FFD3A6; border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #999; font-size: .8rem; margin-bottom: .45rem; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .subject { font-weight: bold; margin-bottom: .25rem; color: #333; word-break: break-word; }
+    .snippet { color: #555; font-size: .82rem; line-height: 1.35; word-break: break-word; }
+    .meta { color: #777; font-size: .78rem; margin-top: .45rem; display: flex; gap: .45rem; flex-wrap: wrap; }
+    .badge-pinned { color: #138808; font-weight: bold; }
+    .badge-locked { color: #c00; font-weight: bold; }
+    @media (max-width: 640px) {
+      #top-bar { flex-direction: column; align-items: flex-start; gap: .25rem; }
+      .catalog-controls, #filter, #sort { width: 100%; max-width: none; }
+      #catalog { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="top-bar">
+    <div>
+      <a href="/">Home</a>
+      <a id="board-link" href="#">Board</a>
+      <a href="/rules.html">Rules</a>
+      <a href="/mod.html">Mod Panel</a>
+    </div>
+    <div>Chat Masala</div>
+  </div>
+
+  <div id="page">
+    <div id="header">
+      <h1 id="title">Catalog</h1>
+      <div class="catalog-controls">
+        <input id="filter" type="text" placeholder="Filter catalog...">
+        <select id="sort">
+          <option value="bumped">Last bumped</option>
+          <option value="newest">Newest</option>
+          <option value="replies">Most replies</option>
+          <option value="images">Most images</option>
+          <option value="oldest">Oldest</option>
+        </select>
+      </div>
+    </div>
+    <div id="catalog"><p style="color:#999">Loading catalog...</p></div>
+  </div>
+
+  <script>
+    const slug = new URLSearchParams(location.search).get('slug') || 'b';
+    let allThreads = [];
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function shortText(value, length) {
+      const text = String(value || '').trim();
+      return text.length > length ? `${text.slice(0, length)}...` : text;
+    }
+
+    function render() {
+      const filter = document.getElementById('filter').value.trim().toLowerCase();
+      const sort = document.getElementById('sort').value;
+      const threads = allThreads.filter(t => {
+        if (!filter) return true;
+        return String(t.subject || '').toLowerCase().includes(filter)
+          || String(t.content || '').toLowerCase().includes(filter);
+      }).sort((a, b) => {
+        if (Number(b.pinned || 0) !== Number(a.pinned || 0)) return Number(b.pinned || 0) - Number(a.pinned || 0);
+        if (sort === 'newest') return new Date(b.created_at) - new Date(a.created_at);
+        if (sort === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+        if (sort === 'replies') return Number(b.reply_count || 0) - Number(a.reply_count || 0);
+        if (sort === 'images') return Number(b.image_count || 0) - Number(a.image_count || 0);
+        return new Date(b.bumped_at) - new Date(a.bumped_at);
+      });
+
+      document.getElementById('catalog').innerHTML = threads.length ? threads.map(t => {
+        const file = t.image_path ? encodeURIComponent(t.image_path) : '';
+        return `
+          <a class="tile" href="/thread.html?id=${t.id}">
+            <div class="thumb">
+              ${file
+                ? `<img src="/uploads/${file}" style="${t.image_mature ? 'filter:blur(8px)' : ''}" alt="">`
+                : '<span>No image</span>'}
+            </div>
+            <div class="subject">${escapeHtml(t.subject || 'No subject')}</div>
+            <div class="snippet">${escapeHtml(shortText(t.content, 120))}</div>
+            <div class="meta">
+              ${t.pinned ? '<span class="badge-pinned">Pinned</span>' : ''}
+              ${t.locked ? '<span class="badge-locked">Locked</span>' : ''}
+              <span>${Number(t.reply_count || 0)} replies</span>
+              <span>${Number(t.image_count || 0)} images</span>
+            </div>
+          </a>`;
+      }).join('') : '<p style="color:#999">No matching threads.</p>';
+    }
+
+    document.getElementById('title').textContent = `/${slug}/ Catalog`;
+    document.title = `/${slug}/ Catalog`;
+    document.getElementById('board-link').href = `/board.html?slug=${encodeURIComponent(slug)}`;
+    document.getElementById('filter').addEventListener('input', render);
+    document.getElementById('sort').addEventListener('change', render);
+
+    fetch(`/api/boards/${encodeURIComponent(slug)}/catalog`)
+      .then(r => r.json())
+      .then(rows => {
+        allThreads = rows;
+        render();
+      });
+  </script>
+</body>
+</html>

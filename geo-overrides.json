@@ -1,0 +1,12 @@
+[
+  {
+    "match": "217.79.117.132",
+    "country": "NO",
+    "note": "Known VPN test endpoint shown as Norway by the VPN provider."
+  },
+  {
+    "match": "79.127.166.209",
+    "country": "AU",
+    "note": "Known VPN test endpoint shown as Australia by the VPN provider."
+  }
+]

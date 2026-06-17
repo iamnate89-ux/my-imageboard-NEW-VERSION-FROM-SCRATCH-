@@ -5,20 +5,21 @@
   <title>Mod Panel</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #eef2ff; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; padding: 1rem; }
+    body { background: #FFF8F0; font-family: arial, helvetica, sans-serif; font-size: 14px; color: #333; padding: 1rem; }
     h2, h3 { color: #444; margin-bottom: .7rem; }
-    input, select, textarea { padding: .4rem; border: 1px solid #b7c0d8; border-radius: 4px; font-family: inherit; font-size: 14px; }
-    button { background: #7788aa; color: white; border: none; padding: .4rem .8rem; border-radius: 4px; cursor: pointer; font-size: 14px; }
-    button:hover { background: #667799; }
+    input, select, textarea { padding: .4rem; border: 1px solid #FFD3A6; border-radius: 4px; font-family: inherit; font-size: 14px; }
+    button { background: #138808; color: white; border: none; padding: .4rem .8rem; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #0d6606; }
     .hidden { display: none !important; }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { border: 1px solid #ccd; padding: .5rem; text-align: left; font-size: .9rem; }
-    th { background: #d6daf0; }
+    th, td { border: 1px solid #FFD3A6; padding: .5rem; text-align: left; font-size: .9rem; }
+    th { background: #fff; color: #000080; }
     .role-admin { color: #c00; font-weight: bold; }
+    .role-moderator { color: #075985; font-weight: bold; }
     .role-janitor { color: #770; font-weight: bold; }
     .tabs { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .tab { padding: .4rem .9rem; cursor: pointer; background: #d6daf0; border-radius: 4px; border: none; font-size: 14px; }
-    .tab.active { background: #7788aa; color: white; }
+    .tab { padding: .4rem .9rem; cursor: pointer; background: #fff; border-radius: 4px; border: 1px solid #FF9933; color: #000080; font-size: 14px; }
+    .tab.active { background: #FF9933; color: white; }
     .section { display: none; }
     .section.active { display: block; }
     .danger { background: #c44; color: white; }
@@ -27,7 +28,7 @@
     .modal-box { background: white; padding: 1.5rem; border-radius: 8px; min-width: 300px; max-width: 400px; }
     .modal-box h3 { margin-bottom: 1rem; }
     .modal-box input { width: 100%; margin-bottom: .5rem; display: block; box-sizing: border-box; }
-    #login-box { max-width: 300px; margin: 3rem auto; background: #d6daf0; padding: 1.5rem; border-radius: 8px; border: 1px solid #b7c0d8; }
+    #login-box { max-width: 300px; margin: 3rem auto; background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #FF9933; }
     #login-box h2 { margin-bottom: 1rem; }
     #login-box input { width: 100%; margin-bottom: .5rem; display: block; box-sizing: border-box; }
     #login-box button { width: 100%; margin-top: .3rem; }
@@ -57,12 +58,16 @@
       Reports <span id="report-count" style="background:#c00;color:white;border-radius:10px;padding:0 .4rem;font-size:.75rem;margin-left:.3rem;display:none"></span>
     </button>
     <button class="tab" id="tab-bans" onclick="showTab('bans', this)">Bans</button>
+    <button class="tab" id="tab-ban-requests" onclick="showTab('ban-requests', this)">Ban Requests</button>
+    <button class="tab" id="tab-deleted" onclick="showTab('deleted', this)">Deleted</button>
     <button class="tab" id="tab-appeals" onclick="showTab('appeals', this)">
       Appeals <span id="appeal-count" style="background:#c00;color:white;border-radius:10px;padding:0 .4rem;font-size:.75rem;margin-left:.3rem;display:none"></span>
     </button>
     <button class="tab" id="tab-staff" onclick="showTab('staff', this)">Staff</button>
     <button class="tab" id="tab-boards" onclick="showTab('boards', this)">Boards</button>
     <button class="tab" id="tab-log" onclick="showTab('log', this)">Log</button>
+    <button class="tab" id="tab-legal" onclick="showTab('legal', this)">Legal Log</button>
+    <button class="tab" id="tab-account" onclick="showTab('account', this)">Account</button>
   </div>
 
   <!-- Posts -->
@@ -91,8 +96,26 @@
   <div id="section-bans" class="section">
     <h3>Active Bans</h3>
     <table>
-      <thead><tr><th>ID</th><th>IP</th><th>Reason</th><th>By</th><th>Expires</th><th>Actions</th></tr></thead>
-      <tbody id="bans-table"><tr><td colspan="6">Loading...</td></tr></tbody>
+      <thead><tr><th>ID</th><th>IP</th><th>Scope</th><th>Reason</th><th>By</th><th>Expires</th><th>Actions</th></tr></thead>
+      <tbody id="bans-table"><tr><td colspan="7">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Ban Requests -->
+  <div id="section-ban-requests" class="section">
+    <h3>Ban Requests</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Board</th><th>Post</th><th>Reason</th><th>Requested By</th><th>Time</th><th>Actions</th></tr></thead>
+      <tbody id="ban-requests-table"><tr><td colspan="7">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Deleted -->
+  <div id="section-deleted" class="section">
+    <h3>Deleted Posts</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Thread</th><th>Board</th><th>Content</th><th>Image</th><th>IP</th><th>Created</th><th>Actions</th></tr></thead>
+      <tbody id="deleted-table"><tr><td colspan="8">Loading...</td></tr></tbody>
     </table>
   </div>
 
@@ -113,12 +136,13 @@
       <input id="new-password" type="password" placeholder="Password" style="width:140px">
       <select id="new-role">
         <option value="janitor">Janitor</option>
+        <option value="moderator">Moderator</option>
         <option value="admin">Admin</option>
       </select>
       <button type="submit">Create</button>
     </form>
     <table>
-      <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+      <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Boards</th><th>Created</th><th>Actions</th></tr></thead>
       <tbody id="staff-table"></tbody>
     </table>
   </div>
@@ -141,10 +165,34 @@
   <!-- Log -->
   <div id="section-log" class="section">
     <h3>Mod Log</h3>
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.5rem">
+      <button onclick="pruneModLog()">Keep Newest 200</button>
+      <button class="danger" onclick="clearModLog()">Clear Mod Log</button>
+    </div>
     <table>
       <thead><tr><th>Time</th><th>Staff</th><th>Action</th><th>Target</th><th>Note</th></tr></thead>
       <tbody id="log-table"></tbody>
     </table>
+  </div>
+
+  <!-- Legal Log -->
+  <div id="section-legal" class="section">
+    <h3>Legal Incident Log</h3>
+    <table>
+      <thead><tr><th>Time</th><th>Post</th><th>Board</th><th>IP</th><th>Reason</th><th>Action</th><th>By</th></tr></thead>
+      <tbody id="legal-table"></tbody>
+    </table>
+  </div>
+
+  <!-- Account -->
+  <div id="section-account" class="section">
+    <h3>Change Password</h3>
+    <form id="change-password-form" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+      <input id="current-password" type="password" placeholder="Current password" style="width:180px">
+      <input id="new-password-self" type="password" placeholder="New password" style="width:180px">
+      <button type="submit">Update Password</button>
+    </form>
+    <p id="password-message" style="font-size:.85rem;color:#666"></p>
   </div>
 </div>
 
@@ -154,6 +202,10 @@
     <h3>Ban User</h3>
     <input id="ban-reason" placeholder="Reason">
     <input id="ban-duration" type="number" placeholder="Hours (blank = permanent)">
+    <select id="ban-scope">
+      <option value="board">This board only</option>
+      <option value="all">All boards</option>
+    </select>
     <div style="display:flex;gap:.5rem;margin-top:.5rem">
       <button onclick="submitBan()">Ban</button>
       <button onclick="closeBanModal()">Cancel</button>
@@ -168,6 +220,10 @@
     <p style="font-size:.85rem;color:#666;margin-bottom:.7rem">The post will be deleted and the user banned.</p>
     <input id="ban-poster-reason" placeholder="Reason">
     <input id="ban-poster-duration" type="number" placeholder="Hours (blank = permanent)">
+    <select id="ban-poster-scope">
+      <option value="board">This board only</option>
+      <option value="all">All boards</option>
+    </select>
     <div style="display:flex;gap:.5rem;margin-top:.5rem">
       <button onclick="submitBanPoster()">Ban</button>
       <button onclick="document.getElementById('ban-poster-modal').classList.add('hidden')">Cancel</button>
@@ -182,6 +238,10 @@
     <p style="font-size:.85rem;color:#666;margin-bottom:.7rem">Ban this user for abusing the report system.</p>
     <input id="ban-reporter-reason" placeholder="Reason">
     <input id="ban-reporter-duration" type="number" placeholder="Hours (blank = permanent)">
+    <select id="ban-reporter-scope">
+      <option value="board">This board only</option>
+      <option value="all">All boards</option>
+    </select>
     <div style="display:flex;gap:.5rem;margin-top:.5rem">
       <button onclick="submitBanReporter()">Ban Reporter</button>
       <button onclick="document.getElementById('ban-reporter-modal').classList.add('hidden')">Cancel</button>
@@ -191,7 +251,55 @@
 
 <script>
   let currentRole = '';
+  let currentStaffId = null;
   let banTargetPostId = null;
+  let csrfToken = '';
+
+  function isAdmin() {
+    return currentRole === 'admin';
+  }
+
+  function isModeratorOrAdmin() {
+    return currentRole === 'admin' || currentRole === 'moderator';
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function jsString(value) {
+    return JSON.stringify(String(value ?? ''));
+  }
+
+  async function loadCsrfToken() {
+    const res = await fetch('/api/csrf-token');
+    if (!res.ok) return;
+    const data = await res.json();
+    csrfToken = data.csrfToken;
+  }
+
+  async function staffFetch(url, options = {}) {
+    if (!csrfToken) await loadCsrfToken();
+    const headers = new Headers(options.headers || {});
+    headers.set('CSRF-Token', csrfToken);
+    return fetch(url, { ...options, headers });
+  }
+
+  async function readError(res, fallback) {
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const data = await res.json().catch(() => ({}));
+      return data.error || fallback;
+    }
+    const text = await res.text().catch(() => '');
+    if (res.status === 404) return `${fallback} The server route was not found; restart the server.`;
+    return text ? `${fallback} Server said: ${text.substring(0, 160)}` : fallback;
+  }
 
   // ── Auth ──────────────────────────────────────────────────
   document.getElementById('login-form').onsubmit = async (e) => {
@@ -221,18 +329,26 @@
 
   function showDashboard(staff) {
     currentRole = staff.role;
+    currentStaffId = staff.id;
     document.getElementById('login-box').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
     document.getElementById('staff-name').textContent = staff.username;
     document.getElementById('staff-role').textContent = staff.role;
-    if (staff.role !== 'admin') {
+    if (!isAdmin()) {
       document.getElementById('tab-staff').classList.add('hidden');
       document.getElementById('tab-boards').classList.add('hidden');
       document.getElementById('tab-log').classList.add('hidden');
+      document.getElementById('tab-legal').classList.add('hidden');
     }
+    if (!isModeratorOrAdmin()) {
+      document.getElementById('tab-bans').classList.add('hidden');
+      document.getElementById('tab-ban-requests').classList.add('hidden');
+      document.getElementById('tab-appeals').classList.add('hidden');
+    }
+    loadCsrfToken();
     loadPosts();
     loadReportCount();
-    loadAppealCount();
+    if (isModeratorOrAdmin()) loadAppealCount();
   }
 
   // ── Tabs ──────────────────────────────────────────────────
@@ -243,17 +359,25 @@
     btn.classList.add('active');
     if (name === 'reports') loadReports();
     if (name === 'bans') loadBans();
+    if (name === 'ban-requests') loadBanRequests();
+    if (name === 'deleted') loadDeletedPosts();
     if (name === 'staff') loadStaff();
     if (name === 'boards') loadBoards();
     if (name === 'log') loadLog();
+    if (name === 'legal') loadLegalIncidents();
     if (name === 'appeals') loadAppeals();
   }
 
   // ── Posts ─────────────────────────────────────────────────
   async function loadPosts() {
     const threadId = document.getElementById('thread-filter').value.trim();
-    const url = threadId ? `/api/threads/${threadId}/posts` : '/api/mod/recent-posts';
+    const url = threadId ? `/api/mod/threads/${threadId}/posts` : '/api/mod/recent-posts';
     const res = await fetch(url);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      document.getElementById('posts-table').innerHTML = `<tr><td colspan="8">${escapeHtml(data.error || 'Could not load posts.')}</td></tr>`;
+      return;
+    }
     const posts = await res.json();
     if (!posts.length) {
       document.getElementById('posts-table').innerHTML = '<tr><td colspan="8">No posts found.</td></tr>';
@@ -263,58 +387,59 @@
       <tr>
         <td>${p.id}</td>
         <td>${p.thread_id}</td>
-        <td>${p.board_slug || '—'}</td>
-        <td>${p.content.substring(0, 80)}${p.content.length > 80 ? '…' : ''}</td>
-        <td>${p.image_path ? `<img src="/uploads/${p.image_path}" style="max-width:60px;max-height:60px;${p.image_mature ? 'filter:blur(4px)' : ''}">` : '—'}</td>
-        <td style="font-size:.8rem">${p.ip_address || '—'}</td>
-        <td style="font-size:.8rem">${p.country ? `<img src="https://flagcdn.com/16x12/${p.country.toLowerCase()}.png" title="${p.country}"> ${p.country}` : '—'}</td>
+        <td>${escapeHtml(p.board_slug || '-')}</td>
+        <td>${escapeHtml((p.content || '').substring(0, 80))}${p.content && p.content.length > 80 ? '...' : ''}</td>
+        <td>${p.image_path ? `<img src="/uploads/${escapeHtml(p.image_path)}" style="max-width:60px;max-height:60px;${p.image_mature ? 'filter:blur(4px)' : ''}">` : '-'}</td>
+        <td style="font-size:.8rem">${escapeHtml(p.ip_address || '-')}</td>
+        <td style="font-size:.8rem">${p.country ? `<img src="https://flagcdn.com/16x12/${escapeHtml(p.country.toLowerCase())}.png" title="${escapeHtml(p.country)}"> ${escapeHtml(p.country)}` : '-'}</td>
         <td>
           <div style="display:flex;gap:.3rem;flex-wrap:wrap">
             <button onclick="deletePost(${p.id})">Del Post</button>
             ${p.image_path ? `<button onclick="deleteImage(${p.id})">Del Img</button>` : ''}
-            ${p.image_path ? `<button onclick="toggleMature(${p.id})" style="${p.image_mature ? 'background:#e67e00' : ''}">${p.image_mature ? '🔞 Unmark' : '🔞 Mature'}</button>` : ''}
-            <button class="danger" onclick="openBanModal(${p.id})">Ban</button>
-            <button onclick="pinThread(${p.thread_id})">📌 Pin</button>
-            <button onclick="lockThread(${p.thread_id})">🔒 Lock</button>
-            <button onclick="deleteAllByIP('${p.ip_address}')">Del All IP</button>
+            ${p.image_path ? `<button onclick="toggleMature(${p.id})" style="${p.image_mature ? 'background:#e67e00' : ''}">${p.image_mature ? 'Unmark Sensitive' : 'Mark Sensitive'}</button>` : ''}
+            ${isModeratorOrAdmin() ? `<button class="danger" onclick="openBanModal(${p.id})">Ban</button>` : ''}
+            ${currentRole === 'janitor' ? `<button class="danger" onclick="requestBan(${p.id})">Request Ban</button>` : ''}
+            ${isAdmin() ? `<button class="danger" onclick="emergencyRemovePost(${p.id})">Emergency</button>` : ''}
+            ${isModeratorOrAdmin() ? `<button onclick="pinThread(${p.thread_id})">Pin</button>` : ''}
+            ${isModeratorOrAdmin() ? `<button onclick="lockThread(${p.thread_id})">Lock</button>` : ''}
+            ${isModeratorOrAdmin() ? `<button onclick='deleteAllByIP(${jsString(p.ip_address)})'>Del All IP</button>` : ''}
           </div>
         </td>
       </tr>`).join('');
   }
-
   async function deletePost(id) {
     if (!confirm('Delete this post?')) return;
-    await fetch(`/api/mod/posts/${id}`, { method: 'DELETE' });
+    await staffFetch(`/api/mod/posts/${id}`, { method: 'DELETE' });
     loadPosts();
   }
 
   async function deleteImage(id) {
     if (!confirm('Delete image only?')) return;
-    await fetch(`/api/mod/posts/${id}/image`, { method: 'DELETE' });
+    await staffFetch(`/api/mod/posts/${id}/image`, { method: 'DELETE' });
     loadPosts();
   }
 
   async function toggleMature(postId) {
-    await fetch(`/api/mod/posts/${postId}/mature`, { method: 'POST' });
+    await staffFetch(`/api/mod/posts/${postId}/mature`, { method: 'POST' });
     loadPosts();
   }
 
   async function deleteAllByIP(ip) {
     if (!confirm(`Delete ALL posts from IP ${ip}?`)) return;
-    const res = await fetch(`/api/mod/posts/by-ip/${encodeURIComponent(ip)}`, { method: 'DELETE' });
+    const res = await staffFetch(`/api/mod/posts/by-ip/${encodeURIComponent(ip)}`, { method: 'DELETE' });
     const data = await res.json();
     alert(`Deleted ${data.deleted} post(s) from ${ip}`);
     loadPosts();
   }
 
   async function pinThread(threadId) {
-    await fetch(`/api/mod/threads/${threadId}/pin`, { method: 'POST' });
+    await staffFetch(`/api/mod/threads/${threadId}/pin`, { method: 'POST' });
     alert('Thread pin toggled.');
     loadPosts();
   }
 
   async function lockThread(threadId) {
-    await fetch(`/api/mod/threads/${threadId}/lock`, { method: 'POST' });
+    await staffFetch(`/api/mod/threads/${threadId}/lock`, { method: 'POST' });
     alert('Thread lock toggled.');
     loadPosts();
   }
@@ -324,6 +449,7 @@
     banTargetPostId = postId;
     document.getElementById('ban-reason').value = '';
     document.getElementById('ban-duration').value = '';
+    document.getElementById('ban-scope').value = 'board';
     document.getElementById('ban-modal').classList.remove('hidden');
   }
 
@@ -335,14 +461,27 @@
   async function submitBan() {
     const reason = document.getElementById('ban-reason').value;
     const hours = document.getElementById('ban-duration').value;
-    await fetch('/api/mod/ban', {
+    const scope = document.getElementById('ban-scope').value;
+    await staffFetch('/api/mod/ban', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post_id: banTargetPostId, reason, duration_hours: hours || null })
+      body: JSON.stringify({ post_id: banTargetPostId, reason, duration_hours: hours || null, ban_scope: scope })
     });
     closeBanModal();
     alert('User banned.');
     loadPosts();
+  }
+
+  async function requestBan(postId) {
+    const reason = prompt('Why should a moderator ban this user?');
+    if (!reason || !reason.trim()) return;
+    const res = await staffFetch(`/api/mod/posts/${postId}/ban-request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason })
+    });
+    if (!res.ok) return alert(await readError(res, 'Could not request ban.'));
+    alert('Ban request sent to moderators.');
   }
 
   // ── Bans ──────────────────────────────────────────────────
@@ -353,19 +492,136 @@
       ? bans.map(b => `
         <tr>
           <td>${b.id}</td>
-          <td>${b.ip_address}</td>
-          <td>${b.reason || '—'}</td>
-          <td>${b.banned_by || '—'}</td>
+          <td>${escapeHtml(b.ip_address)}</td>
+          <td>${b.ban_scope === 'board' ? `/${escapeHtml(b.ban_board || '-')}/` : 'All boards'}</td>
+          <td>${escapeHtml(b.reason || '-')}</td>
+          <td>${escapeHtml(b.banned_by || '-')}</td>
           <td>${b.expires_at ? new Date(b.expires_at).toLocaleString() : 'Permanent'}</td>
           <td><button onclick="unban(${b.id})">Unban</button></td>
         </tr>`).join('')
-      : '<tr><td colspan="6">No active bans.</td></tr>';
+      : '<tr><td colspan="7">No active bans.</td></tr>';
   }
 
   async function unban(id) {
     if (!confirm('Remove this ban?')) return;
-    await fetch(`/api/mod/bans/${id}`, { method: 'DELETE' });
+    await staffFetch(`/api/mod/bans/${id}`, { method: 'DELETE' });
     loadBans();
+  }
+
+  async function loadBanRequests() {
+    const res = await fetch('/api/mod/ban-requests');
+    const requests = await res.json();
+    if (!requests.length) {
+      document.getElementById('ban-requests-table').innerHTML = '<tr><td colspan="7">No open ban requests.</td></tr>';
+      return;
+    }
+    document.getElementById('ban-requests-table').innerHTML = requests.map(r => `
+      <tr>
+        <td>${r.id}</td>
+        <td>/${escapeHtml(r.board_slug)}/</td>
+        <td>
+          <strong>No.${r.post_id}</strong><br>
+          ${r.post_image ? `<img src="/uploads/${escapeHtml(r.post_image)}" style="max-width:80px;max-height:80px;display:block;margin:.3rem 0;border-radius:4px">` : ''}
+          <span style="font-size:.85rem;color:#444">${r.post_content ? escapeHtml(r.post_content.substring(0, 100)) + (r.post_content.length > 100 ? '...' : '') : '<em>deleted</em>'}</span>
+        </td>
+        <td>${escapeHtml(r.reason)}</td>
+        <td>${escapeHtml(r.requested_by)}</td>
+        <td style="font-size:.8rem">${new Date(r.created_at).toLocaleString()}</td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:.3rem">
+            <button onclick="resolveBanRequest(${r.id}, 'accept', 'board')">Board Ban</button>
+            <button class="danger" onclick="resolveBanRequest(${r.id}, 'accept', 'all')">Global Ban</button>
+            <button onclick="resolveBanRequest(${r.id}, 'reject')">Reject</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function resolveBanRequest(id, action, scope = 'board') {
+    const label = action === 'accept'
+      ? (scope === 'all' ? 'create a global ban' : 'create a board-only ban')
+      : 'reject this ban request';
+    if (!confirm(`Are you sure you want to ${label}?`)) return;
+    const hours = action === 'accept'
+      ? prompt('Hours until ban expires? Leave blank for permanent.', '')
+      : null;
+    const res = await staffFetch(`/api/mod/ban-requests/${id}/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ban_scope: scope, duration_hours: hours || null })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return alert(data.error || 'Could not update ban request.');
+    loadBanRequests();
+    if (action === 'accept') loadBans();
+  }
+
+  async function loadDeletedPosts() {
+    const res = await fetch('/api/mod/deleted-posts');
+    const posts = await res.json();
+    const canActOnDeleted = isModeratorOrAdmin() || isAdmin();
+    const table = document.getElementById('section-deleted').querySelector('table');
+    table.querySelector('thead').innerHTML = canActOnDeleted
+      ? '<tr><th>ID</th><th>Thread</th><th>Board</th><th>Content</th><th>Image</th><th>IP</th><th>Created</th><th>Actions</th></tr>'
+      : '<tr><th>ID</th><th>Thread</th><th>Board</th><th>Content</th><th>Image</th><th>IP</th><th>Created</th></tr>';
+    if (!posts.length) {
+      document.getElementById('deleted-table').innerHTML = `<tr><td colspan="${canActOnDeleted ? 8 : 7}">No deleted posts.</td></tr>`;
+      return;
+    }
+    document.getElementById('deleted-table').innerHTML = posts.map(p => `
+      <tr>
+        <td>${p.id}</td>
+        <td>${p.thread_id}</td>
+        <td>${escapeHtml(p.board_slug || '-')}</td>
+        <td>${escapeHtml((p.content || '').substring(0, 120))}${p.content && p.content.length > 120 ? '...' : ''}</td>
+        <td>${p.image_path ? `<img src="/uploads/${p.image_path}" style="max-width:60px;max-height:60px;${p.image_mature ? 'filter:blur(4px)' : ''}">` : '-'}</td>
+        <td style="font-size:.8rem">${escapeHtml(p.ip_address || '-')}</td>
+        <td style="font-size:.8rem">${new Date(p.created_at).toLocaleString()}</td>
+        ${canActOnDeleted ? `<td>
+          <div style="display:flex;gap:.3rem;flex-wrap:wrap">
+            ${isModeratorOrAdmin() ? `<button onclick="restorePost(${p.id})">Restore</button>` : ''}
+            ${isAdmin() ? `<button class="danger" onclick="hardDeletePost(${p.id})">Perm Delete</button>` : ''}
+            ${isAdmin() ? `<button class="danger" onclick="emergencyRemovePost(${p.id})">Emergency</button>` : ''}
+          </div>
+        </td>` : ''}
+      </tr>`).join('');
+  }
+
+  async function restorePost(id) {
+    if (!confirm('Restore this post?')) return;
+    await staffFetch(`/api/mod/posts/${id}/restore`, { method: 'POST' });
+    loadDeletedPosts();
+  }
+
+  async function hardDeletePost(id) {
+    const warning = 'Permanently delete this post? This removes the database record, stored image file, and report/ban post references. This cannot be undone.';
+    if (!confirm(warning)) return;
+    const res = await staffFetch(`/api/admin/posts/${id}/hard`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Permanent delete failed.');
+      return;
+    }
+    loadDeletedPosts();
+  }
+
+  async function emergencyRemovePost(id) {
+    const reason = prompt('Emergency removal reason. Use this only for severe illegal/safety material.');
+    if (!reason || !reason.trim()) return;
+    const notes = prompt('Optional notes for the private legal log. Do not copy or describe illegal material in detail.') || '';
+    const res = await staffFetch(`/api/admin/posts/${id}/emergency-remove`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason, notes })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Emergency removal failed.');
+      return;
+    }
+    alert('Post was hidden, image file removed, and incident logged.');
+    loadPosts();
+    loadDeletedPosts();
   }
 
   // ── Appeals ───────────────────────────────────────────────
@@ -391,11 +647,11 @@
     document.getElementById('appeals-table').innerHTML = appeals.map(a => `
       <tr id="appeal-row-${a.id}">
         <td>${a.id}</td>
-        <td style="font-size:.8rem">${a.ip_address}</td>
-        <td>${a.ban_reason || '—'}</td>
-        <td>${a.banned_by || '—'}</td>
+        <td style="font-size:.8rem">${escapeHtml(a.ip_address)}</td>
+        <td>${escapeHtml(a.ban_reason || '-')}</td>
+        <td>${escapeHtml(a.banned_by || '-')}</td>
         <td style="font-size:.8rem">${a.expires_at ? new Date(a.expires_at).toLocaleString() : 'Permanent'}</td>
-        <td style="max-width:220px;white-space:pre-wrap;font-size:.85rem">${a.message}</td>
+        <td style="max-width:220px;white-space:pre-wrap;font-size:.85rem">${escapeHtml(a.message)}</td>
         <td style="font-size:.8rem">${new Date(a.created_at).toLocaleString()}</td>
         <td>
           <div style="display:flex;flex-direction:column;gap:.3rem">
@@ -408,7 +664,7 @@
 
   async function resolveAppeal(id, action) {
     if (!confirm(action === 'accept' ? 'Accept this appeal and unban the user?' : 'Reject this appeal?')) return;
-    await fetch(`/api/mod/appeals/${id}/${action}`, { method: 'POST' });
+    await staffFetch(`/api/mod/appeals/${id}/${action}`, { method: 'POST' });
     loadAppeals();
     loadAppealCount();
     if (action === 'accept') loadBans();
@@ -416,21 +672,51 @@
 
   // ── Staff ─────────────────────────────────────────────────
   async function loadStaff() {
-    const res = await fetch('/api/admin/staff');
-    const staff = await res.json();
+    const [staffRes, boardsRes] = await Promise.all([
+      fetch('/api/admin/staff'),
+      fetch('/api/boards')
+    ]);
+    const staff = await staffRes.json();
+    const boards = await boardsRes.json();
+    const boardOptions = (selected = []) => boards.map(b =>
+      `<label style="display:inline-flex;gap:.2rem;align-items:center;margin-right:.5rem">
+        <input type="checkbox" value="${escapeHtml(b.slug)}" ${selected.includes(b.slug) ? 'checked' : ''}>
+        /${escapeHtml(b.slug)}/
+      </label>`
+    ).join('');
     document.getElementById('staff-table').innerHTML = staff.map(s => `
       <tr>
         <td>${s.id}</td>
-        <td>${s.username}</td>
-        <td class="role-${s.role}">${s.role}</td>
+        <td>${escapeHtml(s.username)}</td>
+        <td class="role-${escapeHtml(s.role)}">${escapeHtml(s.role)}</td>
+        <td>
+          ${s.role === 'janitor'
+            ? `<div id="staff-boards-${s.id}">${boardOptions(s.boards || [])}</div>
+               <button onclick="saveStaffBoards(${s.id})" style="margin-top:.3rem">Save Boards</button>`
+            : 'All boards'}
+        </td>
         <td>${new Date(s.created_at).toLocaleDateString()}</td>
-        <td><button class="danger" onclick="deleteStaff(${s.id})">Remove</button></td>
+        <td>${s.id === currentStaffId ? 'Current account' : `<button class="danger" onclick="deleteStaff(${s.id})">Remove</button>`}</td>
       </tr>`).join('');
+  }
+
+  async function saveStaffBoards(staffId) {
+    const container = document.getElementById(`staff-boards-${staffId}`);
+    const boards = [...container.querySelectorAll('input[type="checkbox"]:checked')].map(input => input.value);
+    const res = await staffFetch(`/api/admin/staff/${staffId}/boards`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ boards })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return alert(data.error || 'Could not save board assignments.');
+    alert('Board assignments saved.');
+    loadStaff();
   }
 
   document.getElementById('create-staff-form').onsubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch('/api/admin/staff', {
+    const res = await staffFetch('/api/admin/staff', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -443,14 +729,45 @@
       document.getElementById('new-username').value = '';
       document.getElementById('new-password').value = '';
       loadStaff();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Could not create staff account.');
     }
   };
 
   async function deleteStaff(id) {
     if (!confirm('Remove this staff member?')) return;
-    await fetch(`/api/admin/staff/${id}`, { method: 'DELETE' });
+    const res = await staffFetch(`/api/admin/staff/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Could not remove staff member.');
+      return;
+    }
     loadStaff();
   }
+
+  document.getElementById('change-password-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const message = document.getElementById('password-message');
+    const res = await staffFetch('/api/staff/password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_password: document.getElementById('current-password').value,
+        new_password: document.getElementById('new-password-self').value
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      message.style.color = '#c00';
+      message.textContent = data.error || 'Could not update password.';
+      return;
+    }
+    document.getElementById('current-password').value = '';
+    document.getElementById('new-password-self').value = '';
+    message.style.color = '#138808';
+    message.textContent = 'Password updated.';
+  };
 
   // ── Boards ────────────────────────────────────────────────
   async function loadBoards() {
@@ -459,10 +776,10 @@
     document.getElementById('boards-table').innerHTML = boards.length
       ? boards.map(b => `
         <tr>
-          <td>/${b.slug}/</td>
-          <td>${b.name}</td>
-          <td>${b.description || '—'}</td>
-          <td><button class="danger" onclick="deleteBoard('${b.slug}', '${b.name}')">Delete</button></td>
+          <td>/${escapeHtml(b.slug)}/</td>
+          <td>${escapeHtml(b.name)}</td>
+          <td>${escapeHtml(b.description || '-')}</td>
+          <td><button class="danger" onclick='deleteBoard(${jsString(b.slug)}, ${jsString(b.name)})'>Delete</button></td>
         </tr>`).join('')
       : '<tr><td colspan="4">No boards found.</td></tr>';
   }
@@ -473,7 +790,7 @@
     const name = document.getElementById('new-board-name').value.trim();
     const desc = document.getElementById('new-board-desc').value.trim();
     if (!slug || !name) return alert('Slug and name are required.');
-    const res = await fetch('/api/admin/boards', {
+    const res = await staffFetch('/api/admin/boards', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug, name, description: desc })
@@ -488,7 +805,7 @@
 
   async function deleteBoard(slug, name) {
     if (!confirm(`Delete /${slug}/ — ${name}? All threads and posts will be lost.`)) return;
-    const res = await fetch(`/api/admin/boards/${slug}`, { method: 'DELETE' });
+    const res = await staffFetch(`/api/admin/boards/${slug}`, { method: 'DELETE' });
     if (res.ok) loadBoards();
   }
 
@@ -515,21 +832,22 @@
     document.getElementById('reports-table').innerHTML = reports.map(r => `
       <tr id="report-row-${r.id}">
         <td>${r.id}</td>
-        <td>/${r.board_slug}/</td>
+        <td>/${escapeHtml(r.board_slug)}/</td>
         <td>
           <strong>No.${r.post_id}</strong><br>
           ${r.post_image ? `<img src="/uploads/${r.post_image}" style="max-width:80px;max-height:80px;display:block;margin:.3rem 0;border-radius:4px">` : ''}
-          <span style="font-size:.85rem;color:#444">${r.post_content ? r.post_content.substring(0, 100) + (r.post_content.length > 100 ? '…' : '') : '<em>deleted</em>'}</span>
+          <span style="font-size:.85rem;color:#444">${r.post_content ? escapeHtml(r.post_content.substring(0, 100)) + (r.post_content.length > 100 ? '...' : '') : '<em>deleted</em>'}</span>
         </td>
-        <td>${r.reason}</td>
-        <td style="font-size:.8rem">${r.reporter_ip || '—'}</td>
+        <td>${escapeHtml(r.reason)}</td>
+        <td style="font-size:.8rem">${escapeHtml(r.reporter_ip || '-')}</td>
         <td style="font-size:.8rem">${new Date(r.created_at).toLocaleString()}</td>
         <td>
           <div style="display:flex;flex-direction:column;gap:.3rem">
             <button onclick="deleteReportedPost(${r.id})">Del Post</button>
-            <button class="danger" onclick="openBanPosterModal(${r.id})">Ban Poster</button>
             <button onclick="dismissReport(${r.id})">Dismiss</button>
-            <button class="danger" onclick="openBanReporterModal(${r.id})">Ban Reporter</button>
+            ${currentRole === 'janitor' ? `<button class="danger" onclick="requestBan(${r.post_id})">Request Ban</button>` : ''}
+            ${isModeratorOrAdmin() ? `<button class="danger" onclick="openBanPosterModal(${r.id})">Ban Poster</button>` : ''}
+            ${isModeratorOrAdmin() ? `<button class="danger" onclick="openBanReporterModal(${r.id})">Ban Reporter</button>` : ''}
           </div>
         </td>
       </tr>`).join('');
@@ -537,14 +855,14 @@
 
   async function deleteReportedPost(reportId) {
     if (!confirm('Delete this post and close the report?')) return;
-    await fetch(`/api/mod/reports/${reportId}/delete-post`, { method: 'POST' });
+    await staffFetch(`/api/mod/reports/${reportId}/delete-post`, { method: 'POST' });
     loadReports();
     loadReportCount();
   }
 
   async function dismissReport(reportId) {
     if (!confirm('Dismiss this report?')) return;
-    await fetch(`/api/mod/reports/${reportId}/dismiss`, { method: 'POST' });
+    await staffFetch(`/api/mod/reports/${reportId}/dismiss`, { method: 'POST' });
     loadReports();
     loadReportCount();
   }
@@ -554,16 +872,18 @@
     banPosterReportId = reportId;
     document.getElementById('ban-poster-reason').value = '';
     document.getElementById('ban-poster-duration').value = '';
+    document.getElementById('ban-poster-scope').value = 'board';
     document.getElementById('ban-poster-modal').classList.remove('hidden');
   }
 
   async function submitBanPoster() {
     const reason = document.getElementById('ban-poster-reason').value || 'Rule violation';
     const hours = document.getElementById('ban-poster-duration').value;
-    await fetch(`/api/mod/reports/${banPosterReportId}/ban-poster`, {
+    const scope = document.getElementById('ban-poster-scope').value;
+    await staffFetch(`/api/mod/reports/${banPosterReportId}/ban-poster`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason, duration_hours: hours || null })
+      body: JSON.stringify({ reason, duration_hours: hours || null, ban_scope: scope })
     });
     document.getElementById('ban-poster-modal').classList.add('hidden');
     loadReports();
@@ -576,16 +896,18 @@
     banReporterReportId = reportId;
     document.getElementById('ban-reporter-reason').value = '';
     document.getElementById('ban-reporter-duration').value = '';
+    document.getElementById('ban-reporter-scope').value = 'board';
     document.getElementById('ban-reporter-modal').classList.remove('hidden');
   }
 
   async function submitBanReporter() {
     const reason = document.getElementById('ban-reporter-reason').value || 'Abuse of report system';
     const hours = document.getElementById('ban-reporter-duration').value;
-    await fetch(`/api/mod/reports/${banReporterReportId}/ban-reporter`, {
+    const scope = document.getElementById('ban-reporter-scope').value;
+    await staffFetch(`/api/mod/reports/${banReporterReportId}/ban-reporter`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason, duration_hours: hours || null })
+      body: JSON.stringify({ reason, duration_hours: hours || null, ban_scope: scope })
     });
     document.getElementById('ban-reporter-modal').classList.add('hidden');
     loadReports();
@@ -601,12 +923,58 @@
       ? logs.map(l => `
         <tr>
           <td>${new Date(l.created_at).toLocaleString()}</td>
-          <td>${l.staff_username}</td>
-          <td>${l.action}</td>
-          <td>${l.target_id || '—'}</td>
-          <td>${l.note || '—'}</td>
+          <td>${escapeHtml(l.staff_username)}</td>
+          <td>${escapeHtml(l.action)}</td>
+          <td>${l.target_id || '-'}</td>
+          <td>${escapeHtml(l.note || '-')}</td>
         </tr>`).join('')
       : '<tr><td colspan="5">No actions logged yet.</td></tr>';
+  }
+
+  async function pruneModLog() {
+    const keepInput = prompt('How many newest mod-log entries should be kept?', '200');
+    if (keepInput === null) return;
+    const keep = Number(keepInput);
+    if (!Number.isInteger(keep) || keep < 10 || keep > 1000) {
+      alert('Enter a whole number from 10 to 1000.');
+      return;
+    }
+    const res = await staffFetch('/api/admin/log/prune', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keep })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return alert(data.error || 'Could not prune mod log.');
+    alert(`Deleted ${data.deleted} older log entries. Kept newest ${data.kept}.`);
+    loadLog();
+  }
+
+  async function clearModLog() {
+    if (!confirm('Clear the ordinary mod log?')) return;
+    if (!confirm('This cannot be undone. Clear all ordinary mod-log entries?')) return;
+    const res = await staffFetch('/api/admin/log', { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return alert(data.error || 'Could not clear mod log.');
+    alert(`Deleted ${data.deleted} log entries.`);
+    loadLog();
+  }
+
+  async function loadLegalIncidents() {
+    const res = await fetch('/api/admin/legal-incidents');
+    const rows = await res.json();
+    document.getElementById('legal-table').innerHTML = rows.length
+      ? rows.map(i => `
+        <tr>
+          <td>${new Date(i.created_at).toLocaleString()}</td>
+          <td>${i.post_id || '-'}</td>
+          <td>/${escapeHtml(i.board_slug || '-')}/</td>
+          <td style="font-size:.8rem">${escapeHtml(i.ip_address || '-')}</td>
+          <td>${escapeHtml(i.reason)}${i.notes ? '<br><small>' + escapeHtml(i.notes) + '</small>' : ''}</td>
+          <td>${escapeHtml(i.action_taken)}</td>
+          <td>${escapeHtml(i.created_by)}</td>
+        </tr>`).join('')
+      : '<tr><td colspan="7">No legal incidents logged.</td></tr>';
   }
 
   init();
