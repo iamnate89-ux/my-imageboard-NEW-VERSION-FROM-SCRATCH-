@@ -64,17 +64,38 @@ The imageboard should now be running locally.
 
 # Main Files
 
-server.js	Main Express server and API routes
-database.js	SQLite schema and migrations
-public/index.html	Front page
-public/board.html	Board page
-public/thread.html	Thread/reply page
-public/mod.html	Moderation panel
-public/catalog.html	Catalog view
-public/image.html	Image viewer
-public/rules.html	Rules page
-public/style.css	Shared styling
-geo-overrides.json	Manual GeoIP corrections
+server.js	
+Main Express server and API routes
+
+database.js	
+SQLite schema and migrations
+
+public/index.html	
+Front page
+
+public/board.html	
+Board page
+
+public/thread.html	
+Thread/reply page
+
+public/mod.html	
+Moderation panel
+
+public/catalog.html	
+Catalog view
+
+public/image.html	
+Image viewer
+
+public/rules.html	
+Rules page
+
+public/style.css	
+Shared styling
+
+geo-overrides.json	
+Manual GeoIP corrections
 
 # Moderation Features:
 The moderation panel supports:
