@@ -1,6 +1,6 @@
 # Chat Masala Imageboard
 
-Chat Masala is a small imageboard project built for learning full-stack web development. It is currently intended for local/private use, not public production hosting.
+Chat Masala is a small imageboard project built for discussions for the Indian community, and for learning full-stack web development. It is currently intended for local/private use, not public production hosting.
 
 ## What It Does
 
@@ -29,10 +29,9 @@ Chat Masala is a small imageboard project built for learning full-stack web deve
 
 ## How To Run Locally
 
-1. Install dependencies:
+Install dependencies:
 
-```bash
-npm install
+```bash npm install
 
 
 server.js              Main Express server and API routes
@@ -72,28 +71,8 @@ No email system
 No production deployment setup
 No automated test suite yet
 Security should be reviewed before any public use
-Feedback Wanted
-I would appreciate feedback on:
-Code organization
-Security issues
-Moderation system design
-Database structure
-Whether the API routes are clean and understandable
-What should be improved before public hosting
-What features are overcomplicated or unnecessary
-How to make the project easier to maintain
 
 
-Current Limitations
-This project is still experimental and not production-ready.
-Known limitations:
-SQLite is simple but not ideal for a large public site
-IP geolocation can be inaccurate, especially with VPNs
-Uploaded files and database files are local
-No email system
-No production deployment setup
-No automated test suite yet
-Security should be reviewed before any public use
 
 Feedback Wanted
 I would appreciate feedback on:
@@ -105,4 +84,3 @@ Whether the API routes are clean and understandable
 What should be improved before public hosting
 What features are overcomplicated or unnecessary
 How to make the project easier to maintain
-
